@@ -1,7 +1,7 @@
 import os
 from typing import List, Optional
 import tweepy
-from app.config import settings
+from app.config import settings, UPLOADS_DIR
 from app.publishers.base import BasePublisher, ValidationResult, PublishResult
 
 class TwitterPublisher(BasePublisher):
@@ -89,7 +89,7 @@ class TwitterPublisher(BasePublisher):
                 for m_url in media_urls[:self.MAX_IMAGES]:
                     # Resolve local filepath from relative URL or path
                     clean_path = m_url.replace("/uploads/", "").lstrip("/")
-                    local_filepath = settings.BASE_DIR / "uploads" / clean_path
+                    local_filepath = UPLOADS_DIR / clean_path
                     if os.path.exists(local_filepath):
                         media_resp = api.media_upload(filename=str(local_filepath))
                         media_ids.append(media_resp.media_id_string)
