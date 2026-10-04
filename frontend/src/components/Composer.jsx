@@ -8,9 +8,10 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
   const [content, setContent] = useState('');
   const [xContent, setXContent] = useState('');
   const [linkedinContent, setLinkedinContent] = useState('');
+  const [instagramContent, setInstagramContent] = useState('');
   const [customOverrides, setCustomOverrides] = useState(false);
-  const [activeTab, setActiveTab] = useState('master'); // 'master' | 'x' | 'linkedin'
-  const [targetPlatforms, setTargetPlatforms] = useState(['x', 'linkedin']);
+  const [activeTab, setActiveTab] = useState('master'); // 'master' | 'x' | 'linkedin' | 'instagram'
+  const [targetPlatforms, setTargetPlatforms] = useState(['x', 'linkedin', 'instagram']);
   const [mediaUrls, setMediaUrls] = useState([]);
   
   // Scheduling state
@@ -28,9 +29,10 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       setContent(selectedPostToEdit.content || '');
       setXContent(selectedPostToEdit.x_content || '');
       setLinkedinContent(selectedPostToEdit.linkedin_content || '');
+      setInstagramContent(selectedPostToEdit.instagram_content || '');
       setMediaUrls(selectedPostToEdit.media_urls || []);
-      setTargetPlatforms(selectedPostToEdit.target_platforms || ['x', 'linkedin']);
-      if (selectedPostToEdit.x_content || selectedPostToEdit.linkedin_content) {
+      setTargetPlatforms(selectedPostToEdit.target_platforms || ['x', 'linkedin', 'instagram']);
+      if (selectedPostToEdit.x_content || selectedPostToEdit.linkedin_content || selectedPostToEdit.instagram_content) {
         setCustomOverrides(true);
       }
       if (selectedPostToEdit.scheduled_at) {
@@ -50,15 +52,17 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
         content,
         xContent: customOverrides && xContent ? xContent : content,
         linkedinContent: customOverrides && linkedinContent ? linkedinContent : content,
+        instagramContent: customOverrides && instagramContent ? instagramContent : content,
         mediaUrls,
         customOverrides
       });
     }
-  }, [content, xContent, linkedinContent, customOverrides, mediaUrls, onDraftChange]);
+  }, [content, xContent, linkedinContent, instagramContent, customOverrides, mediaUrls, onDraftChange]);
 
   // Derived effective texts
   const effectiveXText = (customOverrides && xContent) ? xContent : content;
   const effectiveLiText = (customOverrides && linkedinContent) ? linkedinContent : content;
+  const effectiveIgText = (customOverrides && instagramContent) ? instagramContent : content;
 
   const togglePlatform = (p) => {
     if (targetPlatforms.includes(p)) {
@@ -71,8 +75,8 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
   };
 
   const handleAIAdapt = async () => {
-    if (!content.trim()) {
-      setStatusMessage({ type: 'error', text: 'Enter a draft or topic first to format with AI.' });
+    if (!content.trim() && mediaUrls.length === 0) {
+      setStatusMessage({ type: 'error', text: 'Please enter draft notes or attach media to generate optimized variants.' });
       return;
     }
     setIsAdaptingAI(true);
@@ -80,15 +84,20 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
     try {
       const res = await aiAdaptContent({
         topic_or_draft: content,
-        tone: 'engaging'
+        tone: 'engaging',
+        media_urls: mediaUrls
       });
       setCustomOverrides(true);
       setXContent(res.x_text);
       setLinkedinContent(res.linkedin_text);
-      setStatusMessage({ type: 'success', text: 'Synthesized tailored drafts for X and LinkedIn!' });
+      setInstagramContent(res.instagram_text || '');
+      if (!content.trim()) {
+        setContent(res.linkedin_text);
+      }
+      setStatusMessage({ type: 'success', text: 'Channel variants tailored and optimized successfully for all channels.' });
     } catch (err) {
       console.error(err);
-      setStatusMessage({ type: 'error', text: 'Failed to format content via AI service.' });
+      setStatusMessage({ type: 'error', text: 'Content optimization request failed. Please check connection.' });
     } finally {
       setIsAdaptingAI(false);
     }
@@ -97,12 +106,17 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
   const handleSubmit = async (publishImmediately = false) => {
     const activeText = content.trim();
     if (!activeText && mediaUrls.length === 0) {
-      setStatusMessage({ type: 'error', text: 'Please write some content or attach media.' });
+      setStatusMessage({ type: 'error', text: 'Please provide message content or attach media.' });
+      return;
+    }
+
+    if (targetPlatforms.includes('instagram') && mediaUrls.length === 0) {
+      setStatusMessage({ type: 'error', text: 'Instagram requires at least one image or video attachment before publishing.' });
       return;
     }
 
     if (isScheduling && !scheduledAt && !publishImmediately) {
-      setStatusMessage({ type: 'error', text: 'Please select a date & time for scheduled publishing.' });
+      setStatusMessage({ type: 'error', text: 'Please specify a target publication date and time.' });
       return;
     }
 
@@ -111,10 +125,11 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
 
     try {
       const payload = {
-        title: activeText.slice(0, 50),
-        content: activeText,
+        title: activeText ? activeText.slice(0, 50) : "Media Broadcast",
+        content: activeText || (customOverrides && instagramContent.trim()) || "Media Broadcast",
         x_content: customOverrides && xContent.trim() ? xContent.trim() : null,
         linkedin_content: customOverrides && linkedinContent.trim() ? linkedinContent.trim() : null,
+        instagram_content: customOverrides && instagramContent.trim() ? instagramContent.trim() : null,
         media_urls: mediaUrls,
         target_platforms: targetPlatforms,
         scheduled_at: isScheduling && scheduledAt && !publishImmediately ? new Date(scheduledAt).toISOString() : null,
@@ -124,13 +139,14 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       const newPost = await createPost(payload);
       setStatusMessage({
         type: 'success',
-        text: publishImmediately ? 'Post dispatched to target networks!' : 'Post scheduled successfully!'
+        text: publishImmediately ? 'Broadcast dispatched to selected channels.' : 'Broadcast scheduled successfully in queue.'
       });
 
       // Reset form
       setContent('');
       setXContent('');
       setLinkedinContent('');
+      setInstagramContent('');
       setMediaUrls([]);
       setScheduledAt('');
       setIsScheduling(false);
@@ -142,9 +158,15 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       }
     } catch (err) {
       console.error('Submit error:', err);
+      const errorDetail = err.response?.data?.detail;
+      const errorMsg = typeof errorDetail === 'string'
+        ? errorDetail
+        : Array.isArray(errorDetail)
+          ? errorDetail.map(d => d.msg || JSON.stringify(d)).join(', ')
+          : err.message || 'Error processing campaign publication.';
       setStatusMessage({
         type: 'error',
-        text: err.response?.data?.detail || 'Error saving or publishing post.'
+        text: errorMsg
       });
     } finally {
       setIsSubmitting(false);
@@ -152,91 +174,109 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
   };
 
   return (
-    <div className="bg-[#0b0c14]/90 border border-white/[0.08] rounded-3xl p-6 sm:p-7 shadow-2xl flex flex-col gap-5 backdrop-blur-xl relative overflow-hidden">
-      {/* Target Networks Selection Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
-        <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="text-xs uppercase tracking-wider font-bold text-neutral-400 font-mono">
-            Networks:
+    <div className="neo-box p-6 sm:p-7 flex flex-col gap-5 bg-white relative overflow-hidden">
+      
+      {/* Target Channels Selection Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-[#111116]/10 pb-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs uppercase tracking-wider font-display font-bold text-[#111116]/70">
+            Publish To Channels:
           </span>
 
-          {/* X (Twitter) Target Button */}
+          {/* Primary Channel A Button */}
           <button
             type="button"
             onClick={() => togglePlatform('x')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 border-2 border-[#111116] transition-all cursor-pointer ${
               targetPlatforms.includes('x')
-                ? 'bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/60 shadow-[0_0_15px_rgba(0,242,254,0.25)]'
-                : 'bg-white/[0.03] text-neutral-400 border border-white/[0.08] hover:border-neutral-600'
+                ? 'bg-[#111116] text-white shadow-[2px_2px_0px_#6a6afe]'
+                : 'bg-white text-[#111116] hover:bg-[#fef7e6]'
             }`}
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
             <span>X (Twitter)</span>
-            {targetPlatforms.includes('x') && <Check className="w-3.5 h-3.5 text-[#00f2fe]" />}
+            {targetPlatforms.includes('x') && <Check className="w-3.5 h-3.5 text-[#6CEBB0]" />}
           </button>
 
-          {/* LinkedIn Target Button */}
+          {/* Primary Channel B Button */}
           <button
             type="button"
             onClick={() => togglePlatform('linkedin')}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 border-2 border-[#111116] transition-all cursor-pointer ${
               targetPlatforms.includes('linkedin')
-                ? 'bg-[#a855f7]/15 text-violet-300 border border-[#a855f7]/60 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
-                : 'bg-white/[0.03] text-neutral-400 border border-white/[0.08] hover:border-neutral-600'
+                ? 'bg-[#6a6afe] text-white shadow-[2px_2px_0px_#111116]'
+                : 'bg-white text-[#111116] hover:bg-[#fef7e6]'
             }`}
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
             </svg>
             <span>LinkedIn</span>
-            {targetPlatforms.includes('linkedin') && <Check className="w-3.5 h-3.5 text-[#a855f7]" />}
+            {targetPlatforms.includes('linkedin') && <Check className="w-3.5 h-3.5 text-[#ffe400]" />}
+          </button>
+
+          {/* Primary Channel C Button: Instagram */}
+          <button
+            type="button"
+            onClick={() => togglePlatform('instagram')}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 border-2 border-[#111116] transition-all cursor-pointer ${
+              targetPlatforms.includes('instagram')
+                ? 'bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-[2px_2px_0px_#111116]'
+                : 'bg-white text-[#111116] hover:bg-[#fef7e6]'
+            }`}
+          >
+            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <span>Instagram</span>
+            {targetPlatforms.includes('instagram') && <Check className="w-3.5 h-3.5 text-white" />}
           </button>
         </div>
 
-        {/* AI Synthesis / Format Button */}
+        {/* AI Content Optimization Action */}
         <button
           type="button"
           onClick={handleAIAdapt}
-          disabled={isAdaptingAI || !content.trim()}
-          className="text-xs font-bold px-4 py-1.5 rounded-full border border-[#ff3b8f]/50 bg-gradient-to-r from-[#ff3b8f]/20 via-[#a855f7]/20 to-[#00f2fe]/20 hover:from-[#ff3b8f]/40 hover:to-[#00f2fe]/40 text-white flex items-center gap-1.5 disabled:opacity-40 transition-all shadow-[0_0_15px_rgba(255,59,143,0.25)] cursor-pointer"
+          disabled={isAdaptingAI || (!content.trim() && mediaUrls.length === 0)}
+          className="text-xs font-display font-bold px-4 py-1.5 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] flex items-center gap-1.5 shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all disabled:opacity-40 cursor-pointer"
         >
           {isAdaptingAI ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <Sparkles className="w-3.5 h-3.5 text-[#ff3b8f]" />
+            <Sparkles className="w-3.5 h-3.5 text-[#ff6a91]" />
           )}
-          <span>Format with AI</span>
+          <span>{mediaUrls.length > 0 && !content.trim() ? 'Generate Media Caption' : 'Optimize Content with AI'}</span>
         </button>
       </div>
 
       {/* Editor Tabs if platform overrides active */}
       {customOverrides && (
-        <div className="flex items-center gap-1.5 bg-[#07080d] p-1.5 rounded-full border border-white/[0.08] text-xs">
+        <div className="flex items-center gap-1.5 bg-[#fef7e6] p-1.5 rounded-full border-2 border-[#111116] text-xs font-display font-bold">
           <button
             type="button"
             onClick={() => setActiveTab('master')}
-            className={`px-4 py-1.5 rounded-full font-semibold transition-all ${
+            className={`px-3.5 py-1 rounded-full transition-all cursor-pointer ${
               activeTab === 'master'
-                ? 'bg-gradient-to-r from-[#ff3b8f] to-[#a855f7] text-white shadow-md'
-                : 'text-neutral-400 hover:text-white'
+                ? 'bg-[#111116] text-white shadow-sm'
+                : 'text-[#111116] hover:bg-white'
             }`}
           >
-            Master Draft
+            Master Content
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('x')}
-            className={`px-4 py-1.5 rounded-full font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3.5 py-1 rounded-full flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'x'
-                ? 'bg-[#00f2fe]/20 text-[#00f2fe] border border-[#00f2fe]/50 shadow-sm'
-                : 'text-neutral-400 hover:text-[#00f2fe]'
+                ? 'bg-[#6a6afe] text-white shadow-sm'
+                : 'text-[#111116] hover:bg-white'
             }`}
           >
-            <span>X (Twitter)</span>
-            <span className={`text-[10px] font-mono px-1.5 rounded-full ${
-              xContent.length > 280 ? 'bg-rose-500/30 text-rose-300' : 'text-neutral-400'
+            <span>Short-Form Variant</span>
+            <span className={`text-[10px] font-mono px-1 rounded-full ${
+              xContent.length > 280 ? 'bg-[#f9665f] text-white' : 'bg-white/30 text-white'
             }`}>
               {xContent.length}/280
             </span>
@@ -244,15 +284,31 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
           <button
             type="button"
             onClick={() => setActiveTab('linkedin')}
-            className={`px-4 py-1.5 rounded-full font-semibold flex items-center gap-1.5 transition-all ${
+            className={`px-3.5 py-1 rounded-full flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'linkedin'
-                ? 'bg-[#a855f7]/20 text-violet-300 border border-[#a855f7]/50 shadow-sm'
-                : 'text-neutral-400 hover:text-violet-300'
+                ? 'bg-[#ff6a91] text-white shadow-sm'
+                : 'text-[#111116] hover:bg-white'
             }`}
           >
-            <span>LinkedIn</span>
-            <span className="text-[10px] font-mono text-neutral-400">
+            <span>Long-Form Variant</span>
+            <span className="text-[10px] font-mono bg-white/30 text-white px-1 rounded-full">
               {linkedinContent.length}/3000
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('instagram')}
+            className={`px-3.5 py-1 rounded-full flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'instagram'
+                ? 'bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-sm'
+                : 'text-[#111116] hover:bg-white'
+            }`}
+          >
+            <span>Instagram Story/Feed</span>
+            <span className={`text-[10px] font-mono px-1 rounded-full ${
+              instagramContent.length > 2200 ? 'bg-[#f9665f] text-white' : 'bg-white/30 text-white'
+            }`}>
+              {instagramContent.length}/2200
             </span>
           </button>
         </div>
@@ -265,8 +321,8 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={5}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Share your message or update here to broadcast across X & LinkedIn..."
-            className="w-full bg-[#05060a] border border-white/[0.08] focus:border-[#00f2fe]/60 rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#00f2fe]/30 transition-all resize-y shadow-inner"
+            placeholder="Author your campaign message, announcement, or insight here..."
+            className="w-full bg-[#fdfaf3] border-2 border-[#111116] focus:border-[#6a6afe] rounded-2xl p-4 text-[#111116] placeholder-[#111116]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6a6afe]/20 transition-all resize-y shadow-inner"
           />
         )}
         {activeTab === 'x' && (
@@ -274,8 +330,8 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={5}
             value={xContent}
             onChange={(e) => setXContent(e.target.value)}
-            placeholder="Tailor specifically for X (Punchy hook, hashtags, under 280 chars)..."
-            className="w-full bg-[#05060a] border border-[#00f2fe]/40 focus:border-[#00f2fe] rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#00f2fe]/40 transition-all resize-y shadow-inner"
+            placeholder="Tailored for short-form channels (Punchy hook, key hashtags, under 280 characters)..."
+            className="w-full bg-[#fdfaf3] border-2 border-[#111116] focus:border-[#111116] rounded-2xl p-4 text-[#111116] placeholder-[#111116]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-black/10 transition-all resize-y shadow-inner"
           />
         )}
         {activeTab === 'linkedin' && (
@@ -283,33 +339,53 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={6}
             value={linkedinContent}
             onChange={(e) => setLinkedinContent(e.target.value)}
-            placeholder="Tailor specifically for LinkedIn (Professional narrative, bullet takeaways, call-to-action)..."
-            className="w-full bg-[#05060a] border border-[#a855f7]/40 focus:border-[#a855f7] rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#a855f7]/40 transition-all resize-y shadow-inner"
+            placeholder="Tailored for professional channels (Context narrative, bullet points, call-to-action)..."
+            className="w-full bg-[#fdfaf3] border-2 border-[#111116] focus:border-[#6a6afe] rounded-2xl p-4 text-[#111116] placeholder-[#111116]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6a6afe]/20 transition-all resize-y shadow-inner"
+          />
+        )}
+        {activeTab === 'instagram' && (
+          <textarea
+            rows={6}
+            value={instagramContent}
+            onChange={(e) => setInstagramContent(e.target.value)}
+            placeholder="Tailored for Instagram (Engaging visual hook, storytelling caption, line breaks & relevant hashtags)..."
+            className="w-full bg-[#fdfaf3] border-2 border-[#dc2743] rounded-2xl p-4 text-[#111116] placeholder-[#111116]/40 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#dc2743]/20 transition-all resize-y shadow-inner"
           />
         )}
 
         {/* Character Metrics & Override Toggle */}
-        <div className="flex items-center justify-between text-xs text-neutral-400 mt-2 px-1">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-between text-xs text-[#111116]/70 mt-2 px-1 font-medium gap-2">
+          <div className="flex items-center gap-4 flex-wrap">
             <span className="flex items-center gap-1.5 font-mono">
-              <span className="text-neutral-400 font-semibold">X:</span>
+              <span className="font-display font-bold text-[#111116]">Short-Form:</span>
               <span className={`font-bold ${
                 effectiveXText.length > 280
-                  ? 'text-rose-400'
-                  : 'text-[#00f2fe]'
+                  ? 'text-[#f9665f]'
+                  : 'text-[#6a6afe]'
               }`}>
                 {effectiveXText.length}/280
               </span>
             </span>
 
             <span className="flex items-center gap-1.5 font-mono">
-              <span className="text-neutral-400 font-semibold">LinkedIn:</span>
+              <span className="font-display font-bold text-[#111116]">Long-Form:</span>
               <span className={`font-bold ${
                 effectiveLiText.length > 3000
-                  ? 'text-rose-400'
-                  : 'text-violet-400'
+                  ? 'text-[#f9665f]'
+                  : 'text-[#ff6a91]'
               }`}>
                 {effectiveLiText.length}/3000
+              </span>
+            </span>
+
+            <span className="flex items-center gap-1.5 font-mono">
+              <span className="font-display font-bold text-[#111116]">Instagram:</span>
+              <span className={`font-bold ${
+                effectiveIgText.length > 2200
+                  ? 'text-[#f9665f]'
+                  : 'text-[#dc2743]'
+              }`}>
+                {effectiveIgText.length}/2200
               </span>
             </span>
           </div>
@@ -320,12 +396,13 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
               if (!customOverrides) {
                 setXContent(content);
                 setLinkedinContent(content);
+                setInstagramContent(content);
               }
               setCustomOverrides(!customOverrides);
             }}
-            className="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
+            className="text-xs text-[#111116] hover:text-[#6a6afe] flex items-center gap-1.5 transition-colors font-display font-bold cursor-pointer"
           >
-            <Layers className="w-3.5 h-3.5 text-[#ff3b8f]" />
+            <Layers className="w-3.5 h-3.5 text-[#ff6a91]" />
             <span>{customOverrides ? 'Revert to Single Master Draft' : 'Customize per platform'}</span>
           </button>
         </div>
@@ -339,46 +416,46 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
 
       {/* Schedule Picker Bar */}
       {isScheduling && (
-        <div className="bg-[#05060a] border border-[#00f2fe]/30 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-md">
-          <div className="flex items-center gap-2 text-cyan-300">
-            <Clock className="w-4 h-4 text-[#00f2fe]" />
-            <span className="font-semibold">Scheduled Broadcast Time:</span>
+        <div className="bg-[#fef7e6] border-2 border-[#111116] rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-[2px_2px_0px_#111116]">
+          <div className="flex items-center gap-2 text-[#111116]">
+            <Clock className="w-4 h-4 text-[#6a6afe]" />
+            <span className="font-display font-bold">Scheduled Broadcast Cadence:</span>
           </div>
           <input
             type="datetime-local"
             value={scheduledAt}
             onChange={(e) => setScheduledAt(e.target.value)}
-            className="bg-[#0c0e18] border border-white/[0.1] rounded-xl px-3 py-1.5 text-neutral-100 text-xs focus:outline-none focus:ring-1 focus:ring-[#00f2fe] font-mono"
+            className="bg-white border-2 border-[#111116] rounded-xl px-3 py-1.5 text-[#111116] text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-[#6a6afe]"
           />
         </div>
       )}
 
       {/* Feedback Alert */}
       {statusMessage && (
-        <div className={`p-3.5 rounded-2xl text-xs flex items-center gap-2.5 border shadow-sm ${
+        <div className={`p-3.5 rounded-2xl text-xs font-medium flex items-center gap-2.5 border-2 border-[#111116] shadow-[2px_2px_0px_#111116] ${
           statusMessage.type === 'error'
-            ? 'bg-rose-950/40 border-rose-500/40 text-rose-300'
-            : 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
+            ? 'bg-[#ffebee] text-[#b71c1c]'
+            : 'bg-[#e8f8f0] text-[#1b5e20]'
         }`}>
           {statusMessage.type === 'error' ? (
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-[#f9665f]" />
           ) : (
-            <Check className="w-4 h-4 shrink-0 text-emerald-400" />
+            <Check className="w-4 h-4 shrink-0 text-[#2e7d32]" />
           )}
-          <span className="font-medium">{statusMessage.text}</span>
+          <span>{statusMessage.text}</span>
         </div>
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+      <div className="flex items-center justify-between pt-3 border-t-2 border-[#111116]/10">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setIsScheduling(!isScheduling)}
-            className={`px-4 py-2 rounded-full text-xs font-semibold border flex items-center gap-2 transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-xs font-display font-bold border-2 border-[#111116] flex items-center gap-2 transition-all cursor-pointer ${
               isScheduling
-                ? 'bg-[#00f2fe]/20 border-[#00f2fe]/60 text-[#00f2fe] shadow-[0_0_15px_rgba(0,242,254,0.3)]'
-                : 'bg-white/[0.03] border-white/[0.08] text-neutral-400 hover:text-white hover:border-white/20'
+                ? 'bg-[#ffe400] text-[#111116] shadow-[2px_2px_0px_#111116]'
+                : 'bg-white text-[#111116] hover:bg-[#fef7e6]'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -389,7 +466,7 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             type="button"
             onClick={() => handleSubmit(false)}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-full text-xs font-semibold bg-white/[0.04] border border-white/[0.08] text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-all disabled:opacity-40 cursor-pointer"
+            className="px-4 py-2 rounded-full text-xs font-display font-bold bg-white border-2 border-[#111116] text-[#111116] hover:bg-[#fef7e6] transition-all disabled:opacity-40 cursor-pointer shadow-[2px_2px_0px_#111116]"
           >
             Save Draft
           </button>
@@ -398,22 +475,27 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
         <button
           type="button"
           onClick={() => handleSubmit(isScheduling ? false : true)}
-          disabled={isSubmitting || (effectiveXText.length > 280 && targetPlatforms.includes('x'))}
-          className={`px-7 py-2.5 rounded-full text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
+          disabled={
+            isSubmitting || 
+            (effectiveXText.length > 280 && targetPlatforms.includes('x')) ||
+            (effectiveIgText.length > 2200 && targetPlatforms.includes('instagram')) ||
+            (targetPlatforms.includes('instagram') && mediaUrls.length === 0)
+          }
+          className={`px-7 py-2.5 rounded-full text-xs font-display font-black flex items-center gap-2 transition-all cursor-pointer border-2 border-[#111116] ${
             isScheduling
-              ? 'border border-[#00f2fe] bg-gradient-to-r from-[#00f2fe]/20 to-[#a855f7]/20 hover:from-[#00f2fe]/40 hover:to-[#a855f7]/40 text-white shadow-[0_0_20px_rgba(0,242,254,0.35)]'
-              : 'border border-[#ff3b8f] bg-gradient-to-r from-[#ff3b8f]/30 via-[#a855f7]/30 to-[#00f2fe]/30 hover:from-[#ff3b8f]/50 hover:to-[#00f2fe]/50 text-white shadow-[0_0_25px_rgba(255,59,143,0.4)]'
+              ? 'bg-[#ffe400] text-[#111116] shadow-[3px_3px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none'
+              : 'bg-[#6a6afe] text-white shadow-[3px_3px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none'
           } disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           {isScheduling ? (
             <>
-              <Clock className="w-4 h-4 text-[#00f2fe]" />
+              <Clock className="w-4 h-4 text-[#111116]" />
               <span>{isSubmitting ? 'Scheduling...' : 'Confirm Schedule'}</span>
             </>
           ) : (
             <>
-              <Send className="w-4 h-4 text-[#ff3b8f]" />
-              <span>{isSubmitting ? 'Dispatching...' : 'Publish Now'}</span>
+              <Send className="w-4 h-4 text-white" />
+              <span>{isSubmitting ? 'Dispatching...' : 'Publish Broadcast'}</span>
             </>
           )}
         </button>

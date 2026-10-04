@@ -74,4 +74,20 @@ export const aiAdaptContent = async (payload) => {
   return res.data;
 };
 
+export const getPostEngagement = async (postId) => {
+  const res = await api.get(`/posts/${postId}/engagement`);
+  return res.data;
+};
+
+export const postComment = async (postId, commentData) => {
+  const res = await api.post(`/posts/${postId}/comments`, commentData);
+  return res.data;
+};
+
+export const aiSuggestReply = async (payload) => {
+  const res = await api.post('/ai/suggest-reply', payload);
+  return res.data;
+};
+
 export default api;
+

@@ -1,6 +1,7 @@
+import os
 from typing import List, Optional
 import httpx
-from app.config import settings
+from app.config import settings, UPLOADS_DIR
 from app.publishers.base import BasePublisher, ValidationResult, PublishResult
 
 class LinkedInPublisher(BasePublisher):
@@ -31,6 +32,53 @@ class LinkedInPublisher(BasePublisher):
     def is_configured(self) -> bool:
         return bool(settings.LINKEDIN_ACCESS_TOKEN and settings.LINKEDIN_AUTHOR_URN)
 
+    async def _upload_image_asset(self, client: httpx.AsyncClient, file_path: str) -> Optional[str]:
+        """Registers and uploads an image to LinkedIn Assets API, returning the asset URN."""
+        headers = {
+            "Authorization": f"Bearer {settings.LINKEDIN_ACCESS_TOKEN.strip()}",
+            "X-Restli-Protocol-Version": "2.0.0",
+            "Content-Type": "application/json"
+        }
+        reg_payload = {
+            "registerUploadRequest": {
+                "recipes": ["urn:li:digitalmediaRecipe:feedshare-image"],
+                "owner": settings.LINKEDIN_AUTHOR_URN.strip(),
+                "supportedUploadMechanism": ["SYNCHRONOUS_UPLOAD"]
+            }
+        }
+        reg_resp = await client.post(
+            "https://api.linkedin.com/v2/assets?action=registerUpload",
+            headers=headers,
+            json=reg_payload
+        )
+        if reg_resp.status_code not in [200, 201]:
+            print(f"LinkedIn asset registration failed: {reg_resp.text}")
+            return None
+
+        val = reg_resp.json().get("value", {})
+        asset_urn = val.get("asset")
+        upload_mechanism = val.get("uploadMechanism", {})
+        media_upload_request = upload_mechanism.get(
+            "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest", {}
+        )
+        upload_url = media_upload_request.get("uploadUrl")
+
+        if not asset_urn or not upload_url:
+            return None
+
+        with open(file_path, "rb") as f:
+            file_bytes = f.read()
+
+        upload_headers = {
+            "Authorization": f"Bearer {settings.LINKEDIN_ACCESS_TOKEN.strip()}"
+        }
+        put_resp = await client.put(upload_url, headers=upload_headers, content=file_bytes)
+        if put_resp.status_code in [200, 201]:
+            return asset_urn
+        else:
+            print(f"LinkedIn binary upload failed: {put_resp.status_code} {put_resp.text}")
+            return None
+
     async def publish(
         self,
         text: str,
@@ -56,40 +104,61 @@ class LinkedInPublisher(BasePublisher):
 
         # Real LinkedIn API call
         try:
-            headers = {
-                "Authorization": f"Bearer {settings.LINKEDIN_ACCESS_TOKEN}",
-                "X-Restli-Protocol-Version": "2.0.0",
-                "LinkedIn-Version": "202401",
-                "Content-Type": "application/json"
-            }
+            async with httpx.AsyncClient(timeout=45.0) as client:
+                # Handle image uploads if attached
+                media_items = []
+                for m_url in media_urls[:9]:
+                    clean_filename = m_url.replace("/uploads/", "").lstrip("/").split("?")[0]
+                    local_path = UPLOADS_DIR / clean_filename
+                    if os.path.exists(local_path):
+                        ext = os.path.splitext(local_path)[1].lower()
+                        if ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]:
+                            asset_urn = await self._upload_image_asset(client, str(local_path))
+                            if asset_urn:
+                                media_items.append({
+                                    "status": "READY",
+                                    "description": {"text": text[:100].strip()},
+                                    "media": asset_urn,
+                                    "title": {"text": "Media Attachment"}
+                                })
 
-            # Standard LinkedIn Community Posts payload
-            payload = {
-                "author": settings.LINKEDIN_AUTHOR_URN,
-                "commentary": text.strip(),
-                "visibility": "PUBLIC",
-                "distribution": {
-                    "feedDistribution": "MAIN_FEED",
-                    "targetEntities": [],
-                    "thirdPartyDistributionChannels": []
-                },
-                "lifecycleState": "PUBLISHED",
-                "isReshareDisabledByAuthor": False
-            }
+                headers = {
+                    "Authorization": f"Bearer {settings.LINKEDIN_ACCESS_TOKEN.strip()}",
+                    "X-Restli-Protocol-Version": "2.0.0",
+                    "Content-Type": "application/json"
+                }
 
-            async with httpx.AsyncClient(timeout=30.0) as client:
+                share_content = {
+                    "shareCommentary": {
+                        "text": text.strip()
+                    }
+                }
+                if media_items:
+                    share_content["shareMediaCategory"] = "IMAGE"
+                    share_content["media"] = media_items
+                else:
+                    share_content["shareMediaCategory"] = "NONE"
+
+                payload = {
+                    "author": settings.LINKEDIN_AUTHOR_URN.strip(),
+                    "lifecycleState": "PUBLISHED",
+                    "specificContent": {
+                        "com.linkedin.ugc.ShareContent": share_content
+                    },
+                    "visibility": {
+                        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+                    }
+                }
+
                 response = await client.post(
-                    "https://api.linkedin.com/rest/posts",
+                    "https://api.linkedin.com/v2/ugcPosts",
                     headers=headers,
                     json=payload
                 )
 
                 if response.status_code in [201, 200]:
-                    # Extract post urn from x-restli-id or x-linkedin-id header
-                    post_urn = response.headers.get("x-restli-id") or response.headers.get("x-linkedin-id")
-                    if not post_urn:
-                        data = response.json() if response.content else {}
-                        post_urn = data.get("id", "urn:li:post:success")
+                    data = response.json() if response.content else {}
+                    post_urn = data.get("id", "urn:li:post:success")
 
                     return PublishResult(
                         success=True,

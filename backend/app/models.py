@@ -15,10 +15,11 @@ class Post(Base):
     content = Column(Text, nullable=False)
     x_content = Column(Text, nullable=True)
     linkedin_content = Column(Text, nullable=True)
+    instagram_content = Column(Text, nullable=True)
     
     # JSON strings
     _media_urls = Column("media_urls", Text, default="[]")
-    _target_platforms = Column("target_platforms", Text, default='["x","linkedin"]')
+    _target_platforms = Column("target_platforms", Text, default='["x","linkedin","instagram"]')
     
     status = Column(String(50), default="DRAFT", index=True)  # DRAFT, SCHEDULED, PUBLISHED, PARTIALLY_PUBLISHED, FAILED, CANCELLED
     scheduled_at = Column(DateTime(timezone=True), nullable=True, index=True)
@@ -27,6 +28,7 @@ class Post(Base):
     updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
     publish_logs = relationship("PublishLog", back_populates="post", cascade="all, delete-orphan", order_by="PublishLog.id.desc()")
+    comments = relationship("PostComment", back_populates="post", cascade="all, delete-orphan", order_by="PostComment.id.asc()")
 
     @property
     def media_urls(self):
@@ -72,3 +74,20 @@ class AppSetting(Base):
     key = Column(String(100), primary_key=True, index=True)
     value = Column(Text, nullable=True)
     updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+
+
+class PostComment(Base):
+    __tablename__ = "post_comments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
+    platform = Column(String(50), nullable=False)  # "x" or "linkedin"
+    author_name = Column(String(255), default="You")
+    author_handle = Column(String(255), nullable=True)
+    content = Column(Text, nullable=False)
+    is_author_reply = Column(Integer, default=1)  # 1 if sent from our dashboard, 0 if received
+    parent_comment_id = Column(String(255), nullable=True)
+    platform_comment_id = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+    post = relationship("Post", back_populates="comments")

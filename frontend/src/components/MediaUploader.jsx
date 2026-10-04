@@ -48,10 +48,10 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`border border-dashed rounded-xl p-4 text-center cursor-pointer transition-all duration-150 flex flex-col items-center justify-center gap-2 ${
+        className={`border-2 border-dashed border-[#111116] rounded-2xl p-4 text-center cursor-pointer transition-all duration-150 flex flex-col items-center justify-center gap-2 ${
           isUploading
-            ? 'border-neutral-700 bg-neutral-900/50 cursor-wait'
-            : 'border-neutral-800 hover:border-neutral-600 bg-neutral-900/40 hover:bg-neutral-900/80'
+            ? 'bg-[#fef7e6] cursor-wait'
+            : 'bg-[#fdfaf3] hover:bg-[#fef7e6] hover:shadow-[3px_3px_0px_#111116]'
         }`}
       >
         <input
@@ -64,21 +64,21 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
         />
 
         {isUploading ? (
-          <div className="flex items-center gap-2 text-sm text-neutral-400">
-            <Loader2 className="w-5 h-5 animate-spin text-neutral-200" />
-            <span>Uploading media asset...</span>
+          <div className="flex items-center gap-2 text-xs font-display font-bold text-[#111116]">
+            <Loader2 className="w-4 h-4 animate-spin text-[#6a6afe]" />
+            <span>Uploading photo asset...</span>
           </div>
         ) : (
           <>
-            <div className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center text-neutral-300">
-              <UploadCloud className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-full bg-[#ffe400] border-2 border-[#111116] flex items-center justify-center text-[#111116] shadow-[2px_2px_0px_#111116]">
+              <UploadCloud className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-xs font-medium text-neutral-200">
-                Click or drag & drop media to attach
+              <p className="text-xs font-display font-bold text-[#111116]">
+                Click or drag & drop media attachments
               </p>
-              <p className="text-[11px] text-neutral-500 mt-0.5">
-                PNG, JPG, GIF, WebP, or MP4 (Max 4 images for X)
+              <p className="text-[11px] text-[#111116]/60 font-medium">
+                PNG, JPG, GIF, WebP (Analyzed automatically for contextual captioning)
               </p>
             </div>
           </>
@@ -86,7 +86,7 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
       </div>
 
       {uploadError && (
-        <p className="text-xs text-rose-400 bg-rose-950/30 border border-rose-800/40 px-3 py-1.5 rounded-lg">
+        <p className="text-xs text-[#b71c1c] bg-[#ffebee] border-2 border-[#111116] px-3 py-1.5 rounded-xl font-medium shadow-[2px_2px_0px_#111116]">
           {uploadError}
         </p>
       )}
@@ -99,11 +99,11 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
             return (
               <div
                 key={index}
-                className="group relative aspect-video bg-neutral-900 rounded-lg overflow-hidden border border-neutral-800"
+                className="group relative aspect-video bg-white rounded-xl overflow-hidden border-2 border-[#111116] shadow-[2px_2px_0px_#111116]"
               >
                 {isVideo ? (
-                  <div className="w-full h-full flex items-center justify-center bg-neutral-950 text-neutral-400">
-                    <Film className="w-6 h-6" />
+                  <div className="w-full h-full flex items-center justify-center bg-[#111116] text-white">
+                    <Film className="w-5 h-5" />
                   </div>
                 ) : (
                   <img
@@ -119,7 +119,7 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
                     e.stopPropagation();
                     handleRemove(index);
                   }}
-                  className="absolute top-1 right-1 p-1 rounded-full bg-black/70 hover:bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-[#f9665f] border border-[#111116] flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
                   title="Remove asset"
                 >
                   <X className="w-3.5 h-3.5" />

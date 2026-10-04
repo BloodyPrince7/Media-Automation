@@ -8,8 +8,8 @@ UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Explicitly load .env from backend and root directories
-load_dotenv(BASE_DIR / ".env")
-load_dotenv(BASE_DIR.parent / ".env")
+load_dotenv(BASE_DIR / ".env", override=True)
+load_dotenv(BASE_DIR.parent / ".env", override=True)
 
 class Settings(BaseSettings):
     # Server settings
@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     LINKEDIN_CLIENT_SECRET: Optional[str] = None
     LINKEDIN_ACCESS_TOKEN: Optional[str] = None
     LINKEDIN_AUTHOR_URN: Optional[str] = None  # e.g., urn:li:person:XXXXXX or urn:li:organization:XXXXXX
+
+    # Facebook Page Graph API Credentials
+    FACEBOOK_ACCESS_TOKEN: Optional[str] = None
+    FACEBOOK_PAGE_ID: Optional[str] = None  # e.g., 100234567890123
+
+    # Instagram Graph API Credentials (Meta Professional Account)
+    INSTAGRAM_ACCESS_TOKEN: Optional[str] = None
+    INSTAGRAM_ACCOUNT_ID: Optional[str] = None  # e.g., 28960740636950255 (verified @pankajkumar_240666)
 
     # Google Gemini API
     GEMINI_API_KEY: Optional[str] = None

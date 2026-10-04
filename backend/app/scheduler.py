@@ -27,9 +27,14 @@ async def execute_post_publication(post_id: int):
         for platform in platforms:
             try:
                 publisher = get_publisher(platform)
-                content = post.x_content if platform == "x" and post.x_content else (
-                    post.linkedin_content if platform == "linkedin" and post.linkedin_content else post.content
-                )
+                if platform == "x" and post.x_content:
+                    content = post.x_content
+                elif platform == "linkedin" and post.linkedin_content:
+                    content = post.linkedin_content
+                elif platform in ["instagram", "ig"] and post.instagram_content:
+                    content = post.instagram_content
+                else:
+                    content = post.content
 
                 result = await publisher.publish(
                     text=content,

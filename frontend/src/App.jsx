@@ -7,22 +7,24 @@ import {
   RefreshCw,
   Sparkles,
   Zap,
-  Globe,
+  CheckCircle2,
   Sliders,
-  ChevronRight
+  ChevronRight,
+  Layers,
+  MessageSquare
 } from 'lucide-react';
 import Composer from './components/Composer';
 import XPreview from './components/XPreview';
 import LinkedInPreview from './components/LinkedInPreview';
+import InstagramPreview from './components/InstagramPreview';
 import ScheduledQueue from './components/ScheduledQueue';
 import PostHistory from './components/PostHistory';
 import SettingsModal from './components/SettingsModal';
 import { getPosts, getHealth, getSettings } from './api/client';
-import heroIllustration from './assets/hero.png';
 
 export default function App() {
   const [activeView, setActiveView] = useState('studio'); // 'studio' | 'queue' | 'history'
-  const [previewTab, setPreviewTab] = useState('x'); // 'x' | 'linkedin' | 'both'
+  const [previewTab, setPreviewTab] = useState('x'); // 'x' | 'linkedin' | 'instagram' | 'both'
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   
   // Data state
@@ -66,259 +68,431 @@ export default function App() {
   const handleEditPost = (post) => {
     setEditingPost(post);
     setActiveView('studio');
-    window.scrollTo({ top: 350, behavior: 'smooth' });
+    window.scrollTo({ top: 380, behavior: 'smooth' });
   };
 
-  return (
-    <div className="min-h-screen bg-[#030305] text-neutral-100 flex flex-col font-sans selection:bg-[#ff3b8f]/30 selection:text-white relative overflow-x-hidden">
-      {/* Ambient Floating Glowing Orbs (matching reference concept) */}
-      <div className="absolute top-28 left-6 sm:left-24 w-6 h-6 rounded-full bg-[#a855f7] shadow-[0_0_30px_10px_rgba(168,85,247,0.7)] pointer-events-none opacity-80" />
-      <div className="absolute top-44 right-8 sm:right-32 w-10 h-10 rounded-full bg-gradient-to-tr from-[#a855f7] to-[#00f2fe] shadow-[0_0_40px_12px_rgba(0,242,254,0.6)] pointer-events-none opacity-80" />
-      <div className="absolute top-80 right-16 w-3 h-3 rounded-full bg-[#ff3b8f] shadow-[0_0_20px_6px_rgba(255,59,143,0.8)] pointer-events-none" />
+  const scheduledCount = posts.filter(p => p.status === 'SCHEDULED').length;
 
-      {/* Minimalist Top Navbar */}
-      <header className="sticky top-0 z-40 bg-[#030305]/80 backdrop-blur-xl border-b border-white/[0.05] px-6 sm:px-12 py-4 flex items-center justify-between">
+  return (
+    <div className="min-h-screen bg-[#fef7e6] text-[#111116] flex flex-col font-sans selection:bg-[#6a6afe] selection:text-white relative overflow-x-hidden">
+      
+      {/* ── TOP HEADER / NAVIGATION ── */}
+      <header className="sticky top-0 z-50 bg-[#fef7e6]/90 backdrop-blur-md border-b-2 border-[#111116] px-4 sm:px-8 py-3.5 flex items-center justify-between transition-all">
         {/* Brand Logo */}
-        <div className="flex items-center gap-3">
-          <span className="font-extrabold text-lg tracking-tight text-white flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#ff3b8f] to-[#00f2fe] shadow-[0_0_10px_rgba(255,59,143,0.8)]" />
-            Pulse Studio
-          </span>
+        <div className="flex items-center gap-2.5">
+          <a href="#" className="flex items-center gap-2.5 group">
+            <span className="w-9 h-9 rounded-full bg-[#6a6afe] border-2 border-[#111116] flex items-center justify-center text-white font-display font-black text-lg shadow-[2px_2px_0px_#111116] group-hover:rotate-6 transition-transform">
+              P
+            </span>
+            <div className="flex flex-col">
+              <span className="font-display font-black text-2xl tracking-tight text-[#111116] leading-none">
+                Pulse<span className="text-[#ff6a91]">.</span>
+              </span>
+              <span className="text-[10px] font-bold text-[#111116]/60 uppercase tracking-widest leading-tight">
+                Media Automation Studio
+              </span>
+            </div>
+          </a>
         </div>
 
-        {/* Minimal Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-neutral-400">
+        {/* Floating Center Pill Navigation */}
+        <nav className="hidden md:flex items-center gap-1.5 bg-white border-2 border-[#111116] px-2.5 py-1.5 rounded-full shadow-[3px_3px_0px_#111116]">
           <button
             onClick={() => setActiveView('studio')}
-            className={`transition-colors hover:text-white ${activeView === 'studio' ? 'text-white font-semibold' : ''}`}
+            className={`px-4 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              activeView === 'studio'
+                ? 'bg-[#6a6afe] text-white shadow-[2px_2px_0px_#111116]'
+                : 'text-[#111116] hover:bg-[#fef7e6]'
+            }`}
           >
-            Studio Composer
+            <span className={`w-2 h-2 rounded-full ${activeView === 'studio' ? 'bg-white' : 'bg-[#6a6afe]'}`} />
+            <span>Studio Composer</span>
           </button>
+
           <button
             onClick={() => setActiveView('queue')}
-            className={`transition-colors hover:text-white flex items-center gap-1.5 ${activeView === 'queue' ? 'text-white font-semibold' : ''}`}
+            className={`px-4 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              activeView === 'queue'
+                ? 'bg-[#ff6a91] text-white shadow-[2px_2px_0px_#111116]'
+                : 'text-[#111116] hover:bg-[#fef7e6]'
+            }`}
           >
+            <span className={`w-2 h-2 rounded-full ${activeView === 'queue' ? 'bg-white' : 'bg-[#ff6a91]'}`} />
             <span>Scheduled Queue</span>
-            {posts.filter(p => p.status === 'SCHEDULED').length > 0 && (
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00f2fe] shadow-[0_0_8px_#00f2fe]" />
+            {scheduledCount > 0 && (
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${activeView === 'queue' ? 'bg-white text-[#ff6a91]' : 'bg-[#ff6a91] text-white'}`}>
+                {scheduledCount}
+              </span>
             )}
           </button>
+
           <button
             onClick={() => setActiveView('history')}
-            className={`transition-colors hover:text-white ${activeView === 'history' ? 'text-white font-semibold' : ''}`}
+            className={`px-4 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              activeView === 'history'
+                ? 'bg-[#6CEBB0] text-[#111116] shadow-[2px_2px_0px_#111116]'
+                : 'text-[#111116] hover:bg-[#fef7e6]'
+            }`}
           >
-            Audit History
-          </button>
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="transition-colors hover:text-white"
-          >
-            Gateways
+            <span className={`w-2 h-2 rounded-full ${activeView === 'history' ? 'bg-[#111116]' : 'bg-[#6CEBB0]'}`} />
+            <span>Published Feed & Engagement</span>
           </button>
         </nav>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-3">
+        {/* Action Controls & Gateways Button */}
+        <div className="flex items-center gap-2.5">
           <button
             onClick={fetchInitialData}
-            className="p-2 rounded-full hover:bg-white/[0.06] text-neutral-400 hover:text-white transition-colors"
+            className="w-9 h-9 rounded-full bg-white border-2 border-[#111116] flex items-center justify-center text-[#111116] hover:bg-[#ffe400] shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
             title="Refresh engine data"
           >
-            <RefreshCw className={`w-4 h-4 ${loadingPosts ? 'animate-spin text-cyan-400' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loadingPosts ? 'animate-spin text-[#6a6afe]' : ''}`} />
           </button>
 
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="px-4 py-1.5 rounded-full border border-neutral-700/80 hover:border-neutral-500 bg-white/[0.02] text-xs font-semibold text-neutral-200 hover:text-white transition-all flex items-center gap-1.5"
+            className="px-4 py-1.5 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-bold text-xs shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
           >
-            <Settings className="w-3.5 h-3.5 text-[#ff3b8f]" />
-            <span>Settings</span>
+            <Settings className="w-3.5 h-3.5" />
+            <span>Channel Settings</span>
           </button>
         </div>
       </header>
 
-      {/* Hero Showcase Section (Directly inspired by reference layout) */}
-      <section className="relative px-6 pt-12 pb-10 sm:pt-16 sm:pb-14 text-center max-w-4xl mx-auto flex flex-col items-center">
-        {/* Subtle Pill Tag */}
-        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-[#ff3b8f]/40 bg-[#ff3b8f]/10 text-xs font-semibold text-pink-300 mb-6 shadow-[0_0_20px_rgba(255,59,143,0.25)]">
-          <Sparkles className="w-3.5 h-3.5 text-[#ff3b8f]" />
-          <span>Multi-Platform Media Automation</span>
+      {/* ── HERO BANNER ── */}
+      <section className="relative pt-12 pb-14 sm:pt-16 sm:pb-20 text-center max-w-5xl mx-auto px-6 overflow-visible">
+        
+        {/* Refined Professional Capability Pills */}
+        <div className="hidden sm:inline-flex absolute top-6 left-2 sm:left-4 rotate-[-3deg] neo-pill bg-[#ffe400] text-[#111116]">
+          <span>Multi-Channel Distribution</span>
         </div>
 
-        {/* Headline matching user's reference image typography */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.08] mb-5">
-          <span className="bg-gradient-to-r from-[#ff3b8f] via-[#c084fc] to-[#00f2fe] bg-clip-text text-transparent">
-            Automated Media.
+        <div className="hidden sm:inline-flex absolute top-8 right-2 sm:right-6 rotate-[2.5deg] neo-pill bg-[#6CEBB0] text-[#111116]">
+          <span>Intelligent Content Adaptation</span>
+        </div>
+
+        <div className="hidden md:inline-flex absolute bottom-8 left-12 rotate-[2deg] neo-pill bg-[#ff6a91] text-white">
+          <span>Unified Reply Stream</span>
+        </div>
+
+        <div className="hidden md:inline-flex absolute bottom-10 right-14 rotate-[-2.5deg] neo-pill bg-[#6a6afe] text-white">
+          <span>Real-Time Performance Metrics</span>
+        </div>
+
+        {/* Small Editorial Category Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-2 border-[#111116] bg-white text-xs font-display font-bold text-[#111116] mb-5 shadow-[2px_2px_0px_#111116]">
+          <span className="w-2 h-2 rounded-full bg-[#6a6afe]" />
+          <span>Unified Social Publishing Engine</span>
+        </div>
+
+        {/* Monumental Headline */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight leading-[1.05] mb-5 text-[#111116]">
+          Publish with precision.{' '}
+          <span className="bg-[#ff6a91] text-white px-3 sm:px-4 py-0.5 rounded-2xl rotate-[-1deg] inline-block shadow-[4px_4px_0px_#111116]">
+            Engage in real-time.
           </span>
-          <br />
-          <span className="text-white">Scalable Distribution.</span>
         </h1>
 
-        {/* Description */}
-        <p className="text-neutral-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed mb-8">
-          Intelligent cross-network publishing engine connecting X (Twitter) and LinkedIn with authentic real-time feed simulation, scheduling queues, and asset adaptation.
+        {/* Professional Subtitle */}
+        <p className="text-[#111116]/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-8 font-medium">
+          Coordinate content across your publishing channels from a single workbench. Craft tailored variations, preview authentic feeds, schedule campaigns, and respond to audience threads in real time.
         </p>
 
-        {/* Pill Action Buttons (matching reference image) */}
-        <div className="flex items-center justify-center gap-4 flex-wrap">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-center gap-3.5 flex-wrap">
           <button
             onClick={() => {
               setActiveView('studio');
-              window.scrollTo({ top: 400, behavior: 'smooth' });
+              window.scrollTo({ top: 480, behavior: 'smooth' });
             }}
-            className="px-7 py-2.5 rounded-full border border-[#ff3b8f] bg-gradient-to-r from-[#ff3b8f]/20 via-[#a855f7]/20 to-[#00f2fe]/20 hover:from-[#ff3b8f]/35 hover:to-[#00f2fe]/35 text-white font-semibold text-xs sm:text-sm shadow-[0_0_25px_rgba(255,59,143,0.35)] transition-all cursor-pointer"
+            className="px-7 py-3 rounded-full bg-[#6a6afe] text-white border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
           >
-            Get Started
+            Open Studio Composer
           </button>
 
           <button
             onClick={() => setActiveView('queue')}
-            className="px-7 py-2.5 rounded-full border border-neutral-700 hover:border-neutral-500 bg-white/[0.03] hover:bg-white/[0.08] text-neutral-300 hover:text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer"
+            className="px-7 py-3 rounded-full bg-white text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
           >
-            View Queue ({posts.filter(p => p.status === 'SCHEDULED').length})
+            Scheduled Queue ({scheduledCount})
+          </button>
+
+          <button
+            onClick={() => setActiveView('history')}
+            className="px-7 py-3 rounded-full bg-[#6CEBB0] text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
+          >
+            Engagement Stream
           </button>
         </div>
       </section>
 
-      {/* Main Studio Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-16 relative z-10">
-        {activeView === 'studio' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Left: Studio Composer Card */}
-            <div className="lg:col-span-7">
-              <div className="mb-3.5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#ff3b8f]" />
-                    <span>{editingPost ? 'Edit Post' : 'Compose & Distribute'}</span>
-                  </h2>
-                  <p className="text-xs text-neutral-400">
-                    Craft your message, adjust platform specifics, and launch.
-                  </p>
-                </div>
+      {/* ── ORGANIC WAVE SCOOP DIVIDER ── */}
+      <div className="w-full relative leading-none -mb-[1px]">
+        <svg className="doooing-wave w-full h-12 sm:h-16" viewBox="0 0 1440 50" preserveAspectRatio="none">
+          <path d="M0,0 C480,50 960,50 1440,0 L1440,50 L0,50 Z" fill="#ffffff" />
+        </svg>
+      </div>
 
-                {editingPost && (
-                  <button
-                    onClick={() => setEditingPost(null)}
-                    className="text-xs text-[#ff3b8f] hover:underline font-semibold"
-                  >
-                    Clear editing
-                  </button>
-                )}
-              </div>
-
-              <Composer
-                onPostCreated={handlePostCreated}
-                selectedPostToEdit={editingPost}
-                onDraftChange={(draft) => {
-                  setLivePreviewText(draft);
-                  setLiveMediaUrls(draft.mediaUrls || []);
-                }}
-              />
-            </div>
-
-            {/* Right: Live Feed Simulator */}
-            <div className="lg:col-span-5 flex flex-col gap-3.5">
-              <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                <span className="text-xs font-mono uppercase tracking-wider font-bold bg-gradient-to-r from-[#00f2fe] to-[#ff3b8f] bg-clip-text text-transparent flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#00f2fe]" />
-                  Live Authentic Simulator
-                </span>
-
-                <div className="flex items-center gap-1 bg-[#0c0d15] border border-white/[0.08] p-1 rounded-full text-xs font-medium">
-                  <button
-                    onClick={() => setPreviewTab('x')}
-                    className={`px-3 py-1 rounded-full transition-all ${
-                      previewTab === 'x'
-                        ? 'bg-sky-500/20 text-sky-300 font-semibold border border-sky-400/40 shadow-sm'
-                        : 'text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    X (Twitter)
-                  </button>
-                  <button
-                    onClick={() => setPreviewTab('linkedin')}
-                    className={`px-3 py-1 rounded-full transition-all ${
-                      previewTab === 'linkedin'
-                        ? 'bg-blue-600/25 text-blue-300 font-semibold border border-blue-400/40 shadow-sm'
-                        : 'text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    LinkedIn
-                  </button>
-                  <button
-                    onClick={() => setPreviewTab('both')}
-                    className={`px-3 py-1 rounded-full transition-all ${
-                      previewTab === 'both'
-                        ? 'bg-gradient-to-r from-[#ff3b8f]/30 to-[#00f2fe]/30 text-white font-semibold border border-white/20 shadow-sm'
-                        : 'text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    Stacked
-                  </button>
-                </div>
-              </div>
-
-              {/* Previews Container */}
-              <div className="space-y-4">
-                {(previewTab === 'x' || previewTab === 'both') && (
-                  <div className="transition-all duration-200">
-                    <XPreview
-                      text={livePreviewText?.xContent || livePreviewText?.content || editingPost?.x_content || editingPost?.content || ''}
-                      mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
-                      charValidation={true}
-                    />
-                  </div>
-                )}
-
-                {(previewTab === 'linkedin' || previewTab === 'both') && (
-                  <div className="transition-all duration-200">
-                    <LinkedInPreview
-                      text={livePreviewText?.linkedinContent || livePreviewText?.content || editingPost?.linkedin_content || editingPost?.content || ''}
-                      mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeView === 'queue' && (
-          <ScheduledQueue
-            posts={posts}
-            onRefresh={fetchInitialData}
-            onEditPost={handleEditPost}
-          />
-        )}
-
-        {activeView === 'history' && (
-          <PostHistory
-            posts={posts}
-            onRefresh={fetchInitialData}
-          />
-        )}
-      </main>
-
-      {/* Bottom Cybernetic Art Banner (matching uploaded image aesthetic) */}
-      <footer className="mt-auto border-t border-white/[0.06] bg-[#030305]/90 pt-8 pb-8 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#00f2fe]" />
-            <span className="font-semibold text-neutral-300">Social Pulse Studio</span>
-            <span>• Direct API Distribution</span>
+      {/* ── MAIN WORKSPACE SECTION ── */}
+      <section className="bg-white border-b-2 border-[#111116] flex-1 py-10 sm:py-14 relative z-10">
+        <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Mobile Tab Navigation */}
+          <div className="flex md:hidden items-center justify-center gap-2 mb-8 flex-wrap">
+            <button
+              onClick={() => setActiveView('studio')}
+              className={`px-4 py-2 rounded-full text-xs font-display font-bold border-2 border-[#111116] ${
+                activeView === 'studio' ? 'bg-[#6a6afe] text-white shadow-[2px_2px_0px_#111116]' : 'bg-white'
+              }`}
+            >
+              Composer
+            </button>
+            <button
+              onClick={() => setActiveView('queue')}
+              className={`px-4 py-2 rounded-full text-xs font-display font-bold border-2 border-[#111116] ${
+                activeView === 'queue' ? 'bg-[#ff6a91] text-white shadow-[2px_2px_0px_#111116]' : 'bg-white'
+              }`}
+            >
+              Queue ({scheduledCount})
+            </button>
+            <button
+              onClick={() => setActiveView('history')}
+              className={`px-4 py-2 rounded-full text-xs font-display font-bold border-2 border-[#111116] ${
+                activeView === 'history' ? 'bg-[#6CEBB0] text-[#111116] shadow-[2px_2px_0px_#111116]' : 'bg-white'
+              }`}
+            >
+              Feed & Engagement
+            </button>
           </div>
 
-          <div className="flex items-center gap-6">
-            <button onClick={() => setIsSettingsOpen(true)} className="hover:text-neutral-300 transition-colors">
-              API Gateways
+          {/* STUDIO VIEW */}
+          {activeView === 'studio' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Studio Composer */}
+              <div className="lg:col-span-7 flex flex-col gap-4">
+                <div className="flex items-center justify-between pb-1">
+                  <div>
+                    <h2 className="text-2xl font-display font-bold text-[#111116] flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-[#6a6afe] border-1.5 border-[#111116]" />
+                      <span>{editingPost ? 'Edit Campaign Draft' : 'Compose & Distribute'}</span>
+                    </h2>
+                    <p className="text-xs text-[#111116]/70 font-medium">
+                      Author your message, adapt for destination channels, and coordinate publication.
+                    </p>
+                  </div>
+
+                  {editingPost && (
+                    <button
+                      onClick={() => setEditingPost(null)}
+                      className="px-3 py-1 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] text-xs font-display font-bold shadow-[2px_2px_0px_#111116] cursor-pointer"
+                    >
+                      Clear Edit
+                    </button>
+                  )}
+                </div>
+
+                <Composer
+                  onPostCreated={handlePostCreated}
+                  selectedPostToEdit={editingPost}
+                  onDraftChange={(draft) => {
+                    setLivePreviewText(draft);
+                    setLiveMediaUrls(draft.mediaUrls || []);
+                  }}
+                />
+              </div>
+
+              {/* Right Column: Live Feed Simulator */}
+              <div className="lg:col-span-5 flex flex-col gap-4">
+                <div className="flex items-center justify-between pb-1 border-b-2 border-[#111116]/10">
+                  <span className="text-xs font-display font-bold uppercase tracking-wider text-[#111116] flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[#6a6afe]" />
+                    Channel Simulation
+                  </span>
+
+                  {/* Switcher Pills */}
+                  <div className="flex items-center gap-1 bg-[#fef7e6] border-2 border-[#111116] p-1 rounded-full text-xs font-display font-bold shadow-[2px_2px_0px_#111116] flex-wrap">
+                    <button
+                      onClick={() => setPreviewTab('x')}
+                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                        previewTab === 'x'
+                          ? 'bg-[#111116] text-white shadow-sm'
+                          : 'text-[#111116] hover:bg-white'
+                      }`}
+                    >
+                      X (Twitter)
+                    </button>
+                    <button
+                      onClick={() => setPreviewTab('linkedin')}
+                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                        previewTab === 'linkedin'
+                          ? 'bg-[#6a6afe] text-white shadow-sm'
+                          : 'text-[#111116] hover:bg-white'
+                      }`}
+                    >
+                      LinkedIn
+                    </button>
+                    <button
+                      onClick={() => setPreviewTab('instagram')}
+                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                        previewTab === 'instagram'
+                          ? 'bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-sm'
+                          : 'text-[#111116] hover:bg-white'
+                      }`}
+                    >
+                      Instagram
+                    </button>
+                    <button
+                      onClick={() => setPreviewTab('both')}
+                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                        previewTab === 'both'
+                          ? 'bg-[#ff6a91] text-white shadow-sm'
+                          : 'text-[#111116] hover:bg-white'
+                      }`}
+                    >
+                      All Channels
+                    </button>
+                  </div>
+                </div>
+
+                {/* Simulator Previews Container */}
+                <div className="space-y-4">
+                  {(previewTab === 'x' || previewTab === 'both') && (
+                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                        <span className="text-xs font-display font-bold text-[#111116] flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#111116]" />
+                          Feed Simulation (Short-Form)
+                        </span>
+                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                          {livePreviewText?.xContent?.length || livePreviewText?.content?.length || 0}/280
+                        </span>
+                      </div>
+                      <XPreview
+                        text={livePreviewText?.xContent || livePreviewText?.content || editingPost?.x_content || editingPost?.content || ''}
+                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                        charValidation={true}
+                      />
+                    </div>
+                  )}
+
+                  {(previewTab === 'linkedin' || previewTab === 'both') && (
+                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                        <span className="text-xs font-display font-bold text-[#6a6afe] flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#6a6afe]" />
+                          Feed Simulation (Long-Form)
+                        </span>
+                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                          {livePreviewText?.linkedinContent?.length || livePreviewText?.content?.length || 0}/3000
+                        </span>
+                      </div>
+                      <LinkedInPreview
+                        text={livePreviewText?.linkedinContent || livePreviewText?.content || editingPost?.linkedin_content || editingPost?.content || ''}
+                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                      />
+                    </div>
+                  )}
+
+                  {(previewTab === 'instagram' || previewTab === 'both') && (
+                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                        <span className="text-xs font-display font-bold text-[#dc2743] flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-[#dc2743]" />
+                          Feed Simulation (Visual & Storytelling)
+                        </span>
+                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                          {livePreviewText?.instagramContent?.length || livePreviewText?.content?.length || 0}/2200
+                        </span>
+                      </div>
+                      <InstagramPreview
+                        text={livePreviewText?.instagramContent || livePreviewText?.content || editingPost?.instagram_content || editingPost?.content || ''}
+                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* QUEUE VIEW */}
+          {activeView === 'queue' && (
+            <ScheduledQueue
+              posts={posts}
+              onRefresh={fetchInitialData}
+              onEditPost={handleEditPost}
+            />
+          )}
+
+          {/* FEED & ENGAGEMENT VIEW */}
+          {activeView === 'history' && (
+            <PostHistory
+              posts={posts}
+              onRefresh={fetchInitialData}
+            />
+          )}
+
+        </div>
+      </section>
+
+      {/* ── ORGANIC WAVE SCOOP DIVIDER ── */}
+      <div className="w-full relative leading-none -mb-[1px]">
+        <svg className="doooing-wave w-full h-12 sm:h-16" viewBox="0 0 1440 50" preserveAspectRatio="none">
+          <path d="M0,0 C480,50 960,50 1440,0 L1440,50 L0,50 Z" fill="#ff6a91" />
+        </svg>
+      </div>
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-[#ff6a91] text-white pt-10 pb-12 px-6 sm:px-12 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col gap-10">
+          
+          {/* Main CTA */}
+          <div className="text-center py-6">
+            <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white mb-4">
+              Scale your communication across every channel.
+            </h2>
+            <p className="text-white/90 text-sm sm:text-base max-w-xl mx-auto mb-6 font-medium">
+              Centralized authoring, intelligent channel adaptation, and direct real-time thread interactions.
+            </p>
+            <button
+              onClick={() => {
+                setActiveView('studio');
+                window.scrollTo({ top: 380, behavior: 'smooth' });
+              }}
+              className="px-8 py-3 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-black text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
+            >
+              Compose Broadcast
             </button>
-            <button onClick={() => setActiveView('queue')} className="hover:text-neutral-300 transition-colors">
-              Schedule Queue
-            </button>
-            <button onClick={() => setActiveView('history')} className="hover:text-neutral-300 transition-colors">
-              Audit Logs
-            </button>
+          </div>
+
+          {/* Footer Navigation Columns */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t-2 border-white/20 text-xs font-display font-bold">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] flex items-center justify-center font-black">
+                P
+              </span>
+              <span className="text-base tracking-tight text-white">Social Pulse Studio</span>
+            </div>
+
+            <div className="flex items-center gap-6 flex-wrap justify-center">
+              <button onClick={() => setActiveView('studio')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
+                Studio Composer
+              </button>
+              <button onClick={() => setActiveView('queue')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
+                Scheduled Queue
+              </button>
+              <button onClick={() => setActiveView('history')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
+                Published Feed
+              </button>
+              <button onClick={() => setIsSettingsOpen(true)} className="hover:text-[#ffe400] transition-colors cursor-pointer">
+                Channel Gateways
+              </button>
+            </div>
+
+            <div className="text-white/80 font-normal font-sans text-xs">
+              © 2026 Pulse Studio Enterprise
+            </div>
           </div>
         </div>
       </footer>

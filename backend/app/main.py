@@ -12,16 +12,19 @@ from sqlalchemy.orm import Session
 
 from app.config import settings, UPLOADS_DIR
 from app.database import get_db, init_db
-from app.models import Post, PublishLog
+from app.models import Post, PublishLog, PostComment
 from app.schemas import (
     PostCreate, PostUpdate, PostOut,
     SettingsOut, SettingsUpdate,
     AIAdaptRequest, AIAdaptResponse,
-    PlatformValidationResponse
+    PlatformValidationResponse,
+    PostCommentCreate, PostCommentOut,
+    PlatformMetrics, PostEngagementOut,
+    AISuggestReplyRequest, AISuggestReplyResponse
 )
 from app.publishers import get_publisher
 from app.scheduler import start_scheduler, shutdown_scheduler, execute_post_publication
-from app.ai_service import adapt_content_with_gemini
+from app.ai_service import adapt_content_with_gemini, suggest_reply_with_gemini
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -128,11 +131,27 @@ async def create_post(payload: PostCreate, db: Session = Depends(get_db)):
     elif payload.scheduled_at:
         initial_status = "SCHEDULED"
 
+    # Ensure content is never empty (required by Post.content nullable=False)
+    resolved_content = (
+        (payload.content and payload.content.strip())
+        or (payload.instagram_content and payload.instagram_content.strip())
+        or (payload.linkedin_content and payload.linkedin_content.strip())
+        or (payload.x_content and payload.x_content.strip())
+        or ("Media post" if payload.media_urls else "Post")
+    )
+
+    resolved_title = (
+        (payload.title and payload.title.strip())
+        or resolved_content[:50]
+        or "Media broadcast"
+    )
+
     post = Post(
-        title=payload.title,
-        content=payload.content,
+        title=resolved_title,
+        content=resolved_content,
         x_content=payload.x_content,
         linkedin_content=payload.linkedin_content,
+        instagram_content=payload.instagram_content,
         status=initial_status,
         scheduled_at=payload.scheduled_at
     )
@@ -165,6 +184,8 @@ def update_post(post_id: int, payload: PostUpdate, db: Session = Depends(get_db)
         post.x_content = payload.x_content
     if payload.linkedin_content is not None:
         post.linkedin_content = payload.linkedin_content
+    if payload.instagram_content is not None:
+        post.instagram_content = payload.instagram_content
     if payload.media_urls is not None:
         post.media_urls = payload.media_urls
     if payload.target_platforms is not None:
@@ -206,14 +227,263 @@ async def trigger_publish(post_id: int, db: Session = Depends(get_db)):
 @app.post("/api/ai/adapt", response_model=AIAdaptResponse)
 async def ai_adapt(req: AIAdaptRequest):
     result = await adapt_content_with_gemini(
-        topic_or_draft=req.topic_or_draft,
-        tone=req.tone or "engaging"
+        topic_or_draft=req.topic_or_draft or "",
+        tone=req.tone or "engaging",
+        media_urls=req.media_urls or []
     )
     return AIAdaptResponse(
         x_text=result["x_text"],
         linkedin_text=result["linkedin_text"],
+        instagram_text=result.get("instagram_text", ""),
         suggested_hashtags=result["suggested_hashtags"]
     )
+
+
+# --- ENGAGEMENT & COMMENTS ---
+@app.get("/api/posts/{post_id}/engagement", response_model=PostEngagementOut)
+async def get_post_engagement(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    metrics_list = []
+
+    # Check published platforms from logs
+    for log in post.publish_logs:
+        if log.status != "SUCCESS":
+            continue
+
+        if log.platform == "x" and log.platform_post_id:
+            m = PlatformMetrics(
+                platform="x",
+                post_url=log.post_url,
+                platform_post_id=log.platform_post_id
+            )
+            try:
+                from requests_oauthlib import OAuth1Session
+                if settings.X_API_KEY and settings.X_ACCESS_TOKEN:
+                    oauth = OAuth1Session(
+                        client_key=settings.X_API_KEY.strip(),
+                        client_secret=settings.X_API_SECRET.strip(),
+                        resource_owner_key=settings.X_ACCESS_TOKEN.strip(),
+                        resource_owner_secret=settings.X_ACCESS_TOKEN_SECRET.strip()
+                    )
+                    resp = oauth.get(
+                        f"https://api.twitter.com/2/tweets/{log.platform_post_id}?tweet.fields=public_metrics"
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json().get("data", {})
+                        pm = data.get("public_metrics", {})
+                        m.likes = pm.get("like_count", 0)
+                        m.replies = pm.get("reply_count", 0)
+                        m.reposts = pm.get("retweet_count", 0)
+                        m.impressions = pm.get("impression_count", 0)
+                        m.raw_metrics = pm
+            except Exception as e:
+                print(f"Error fetching X metrics: {e}")
+            metrics_list.append(m)
+
+        elif log.platform == "linkedin":
+            m = PlatformMetrics(
+                platform="linkedin",
+                post_url=log.post_url,
+                platform_post_id=log.platform_post_id,
+                likes=0,
+                replies=len([c for c in post.comments if c.platform == "linkedin"]),
+                reposts=0
+            )
+            metrics_list.append(m)
+
+        elif log.platform in ["instagram", "ig"]:
+            m = PlatformMetrics(
+                platform="instagram",
+                post_url=log.post_url,
+                platform_post_id=log.platform_post_id,
+                likes=0,
+                replies=len([c for c in post.comments if c.platform == "instagram"]),
+                reposts=0
+            )
+            if settings.INSTAGRAM_ACCESS_TOKEN and log.platform_post_id:
+                try:
+                    import requests
+                    ig_base = "https://graph.instagram.com/v19.0" if settings.INSTAGRAM_ACCESS_TOKEN.strip().startswith("IGA") else "https://graph.facebook.com/v19.0"
+                    ig_res = requests.get(
+                        f"{ig_base}/{log.platform_post_id}",
+                        params={
+                            "fields": "like_count,comments_count",
+                            "access_token": settings.INSTAGRAM_ACCESS_TOKEN.strip()
+                        },
+                        timeout=5
+                    )
+                    if ig_res.status_code == 200:
+                        ig_data = ig_res.json()
+                        m.likes = ig_data.get("like_count", 0)
+                        m.replies = ig_data.get("comments_count", 0)
+                except Exception:
+                    pass
+            metrics_list.append(m)
+
+    comments_list = [
+        PostCommentOut(
+            id=c.id,
+            post_id=c.post_id,
+            platform=c.platform,
+            author_name=c.author_name,
+            author_handle=c.author_handle,
+            content=c.content,
+            is_author_reply=bool(c.is_author_reply),
+            parent_comment_id=c.parent_comment_id,
+            platform_comment_id=c.platform_comment_id,
+            created_at=c.created_at
+        )
+        for c in post.comments
+    ]
+
+    return PostEngagementOut(
+        post_id=post.id,
+        metrics=metrics_list,
+        comments=comments_list
+    )
+
+
+@app.post("/api/posts/{post_id}/comments", response_model=PostCommentOut)
+async def post_comment_reply(post_id: int, payload: PostCommentCreate, db: Session = Depends(get_db)):
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    platform = payload.platform.lower()
+    platform_comment_id = None
+
+    target_log = next((l for l in post.publish_logs if l.platform == platform and l.status == "SUCCESS"), None)
+    target_post_id = target_log.platform_post_id if target_log else None
+
+    # Real-time dispatch for X replies
+    if platform == "x" and target_post_id and settings.X_API_KEY:
+        try:
+            from requests_oauthlib import OAuth1Session
+            oauth = OAuth1Session(
+                client_key=settings.X_API_KEY.strip(),
+                client_secret=settings.X_API_SECRET.strip(),
+                resource_owner_key=settings.X_ACCESS_TOKEN.strip(),
+                resource_owner_secret=settings.X_ACCESS_TOKEN_SECRET.strip()
+            )
+            in_reply_to = payload.parent_comment_id or target_post_id
+            tweet_body = {
+                "text": payload.content.strip(),
+                "reply": {
+                    "in_reply_to_tweet_id": str(in_reply_to)
+                }
+            }
+            tw_resp = oauth.post(
+                "https://api.twitter.com/2/tweets",
+                json=tweet_body,
+                headers={"Content-Type": "application/json"}
+            )
+            if tw_resp.status_code in [200, 201]:
+                res_data = tw_resp.json().get("data", {})
+                platform_comment_id = str(res_data.get("id"))
+            else:
+                print(f"X reply warning ({tw_resp.status_code}): {tw_resp.text}")
+        except Exception as x_err:
+            print(f"Failed to publish X reply tweet: {x_err}")
+
+    # Real-time dispatch for LinkedIn replies
+    elif platform == "linkedin" and target_post_id and settings.LINKEDIN_ACCESS_TOKEN:
+        try:
+            import urllib.parse
+            import requests
+            encoded_urn = urllib.parse.quote(target_post_id)
+            li_headers = {
+                "Authorization": f"Bearer {settings.LINKEDIN_ACCESS_TOKEN.strip()}",
+                "X-Restli-Protocol-Version": "2.0.0",
+                "Content-Type": "application/json"
+            }
+            li_body = {
+                "actor": settings.LINKEDIN_AUTHOR_URN.strip(),
+                "message": {
+                    "text": payload.content.strip()
+                }
+            }
+            if payload.parent_comment_id:
+                li_body["parentComment"] = payload.parent_comment_id
+
+            li_resp = requests.post(
+                f"https://api.linkedin.com/v2/socialActions/{encoded_urn}/comments",
+                headers=li_headers,
+                json=li_body,
+                timeout=15
+            )
+            if li_resp.status_code in [200, 201]:
+                li_data = li_resp.json()
+                platform_comment_id = li_data.get("$URN") or str(li_data.get("id"))
+            else:
+                print(f"LinkedIn reply warning ({li_resp.status_code}): {li_resp.text}")
+        except Exception as li_err:
+            print(f"Failed to publish LinkedIn comment: {li_err}")
+
+    # Real-time dispatch for Instagram replies
+    elif platform in ["instagram", "ig"] and target_post_id and settings.INSTAGRAM_ACCESS_TOKEN:
+        try:
+            import requests
+            ig_base = "https://graph.instagram.com/v19.0" if settings.INSTAGRAM_ACCESS_TOKEN.strip().startswith("IGA") else "https://graph.facebook.com/v19.0"
+            target_endpoint = (
+                f"{ig_base}/{payload.parent_comment_id}/replies"
+                if payload.parent_comment_id
+                else f"{ig_base}/{target_post_id}/comments"
+            )
+            ig_rep = requests.post(
+                target_endpoint,
+                params={
+                    "message": payload.content.strip(),
+                    "access_token": settings.INSTAGRAM_ACCESS_TOKEN.strip()
+                },
+                timeout=15
+            )
+            if ig_rep.status_code == 200:
+                ig_rep_data = ig_rep.json()
+                platform_comment_id = ig_rep_data.get("id")
+            else:
+                print(f"Instagram reply warning ({ig_rep.status_code}): {ig_rep.text}")
+        except Exception as ig_err:
+            print(f"Failed to publish Instagram comment: {ig_err}")
+
+    comment_record = PostComment(
+        post_id=post.id,
+        platform=platform,
+        author_name="You (Author)",
+        author_handle="@Pagal88114784" if platform == "x" else "Pankaj kumar",
+        content=payload.content.strip(),
+        is_author_reply=1,
+        parent_comment_id=payload.parent_comment_id,
+        platform_comment_id=platform_comment_id
+    )
+    db.add(comment_record)
+    db.commit()
+    db.refresh(comment_record)
+
+    return PostCommentOut(
+        id=comment_record.id,
+        post_id=comment_record.post_id,
+        platform=comment_record.platform,
+        author_name=comment_record.author_name,
+        author_handle=comment_record.author_handle,
+        content=comment_record.content,
+        is_author_reply=bool(comment_record.is_author_reply),
+        parent_comment_id=comment_record.parent_comment_id,
+        platform_comment_id=comment_record.platform_comment_id,
+        created_at=comment_record.created_at
+    )
+
+
+@app.post("/api/ai/suggest-reply", response_model=AISuggestReplyResponse)
+async def ai_suggest_reply(req: AISuggestReplyRequest):
+    suggestions = await suggest_reply_with_gemini(
+        post_content=req.post_content,
+        comment_text=req.comment_text,
+        tone=req.tone or "engaging"
+    )
+    return AISuggestReplyResponse(suggestions=suggestions)
 
 
 # --- SETTINGS / CREDENTIALS STATUS ---
@@ -222,8 +492,10 @@ def get_settings():
     return SettingsOut(
         has_x_credentials=bool(settings.X_API_KEY and settings.X_ACCESS_TOKEN),
         has_linkedin_credentials=bool(settings.LINKEDIN_ACCESS_TOKEN and settings.LINKEDIN_AUTHOR_URN),
+        has_instagram_credentials=bool(settings.INSTAGRAM_ACCESS_TOKEN and settings.INSTAGRAM_ACCOUNT_ID),
         has_gemini_credentials=bool(settings.GEMINI_API_KEY),
-        linkedin_author_urn=settings.LINKEDIN_AUTHOR_URN
+        linkedin_author_urn=settings.LINKEDIN_AUTHOR_URN,
+        instagram_account_id=settings.INSTAGRAM_ACCOUNT_ID
     )
 
 
@@ -243,6 +515,10 @@ def update_settings(update: SettingsUpdate):
         settings.LINKEDIN_ACCESS_TOKEN = update.linkedin_access_token
     if update.linkedin_author_urn is not None:
         settings.LINKEDIN_AUTHOR_URN = update.linkedin_author_urn
+    if update.instagram_access_token is not None:
+        settings.INSTAGRAM_ACCESS_TOKEN = update.instagram_access_token
+    if update.instagram_account_id is not None:
+        settings.INSTAGRAM_ACCOUNT_ID = update.instagram_account_id
     if update.gemini_api_key is not None:
         settings.GEMINI_API_KEY = update.gemini_api_key
 
@@ -250,5 +526,7 @@ def update_settings(update: SettingsUpdate):
         "message": "Settings updated",
         "has_x_credentials": bool(settings.X_API_KEY and settings.X_ACCESS_TOKEN),
         "has_linkedin_credentials": bool(settings.LINKEDIN_ACCESS_TOKEN and settings.LINKEDIN_AUTHOR_URN),
-        "has_gemini_credentials": bool(settings.GEMINI_API_KEY)
+        "has_instagram_credentials": bool(settings.INSTAGRAM_ACCESS_TOKEN and settings.INSTAGRAM_ACCOUNT_ID),
+        "has_gemini_credentials": bool(settings.GEMINI_API_KEY),
+        "instagram_account_id": settings.INSTAGRAM_ACCOUNT_ID
     }
