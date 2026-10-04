@@ -1,10 +1,15 @@
 from pathlib import Path
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Explicitly load .env from backend and root directories
+load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR.parent / ".env")
 
 class Settings(BaseSettings):
     # Server settings
