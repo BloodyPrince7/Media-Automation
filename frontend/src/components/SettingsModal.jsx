@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, Key, ShieldCheck, ShieldAlert, Check, Eye, EyeOff, Sparkles } from 'lucide-react';
+import { X, Key, ShieldCheck, ShieldAlert, Check, Eye, EyeOff, Sparkles, ExternalLink, HelpCircle, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { getSettings, updateSettings } from '../api/client';
 
 export default function SettingsModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showTokens, setShowTokens] = useState(false);
+  const [activeGuide, setActiveGuide] = useState(null); // 'x', 'linkedin', 'instagram', 'gemini'
 
   const [hasXCreds, setHasXCreds] = useState(false);
   const [hasLiCreds, setHasLiCreds] = useState(false);
@@ -152,6 +153,44 @@ export default function SettingsModal({ isOpen, onClose }) {
               </span>
             </div>
 
+            {/* Guide Toggle */}
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={() => setActiveGuide(activeGuide === 'x' ? null : 'x')}
+                className="text-[11px] text-[#111116] hover:text-[#6a6afe] flex items-center gap-1 font-semibold underline decoration-dotted cursor-pointer"
+              >
+                <BookOpen className="w-3 h-3 text-[#6a6afe]" />
+                <span>{activeGuide === 'x' ? 'Hide documentation' : 'How to get X tokens & keys'}</span>
+                {activeGuide === 'x' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            </div>
+
+            {/* X Guide Drawer */}
+            {activeGuide === 'x' && (
+              <div className="p-3.5 bg-white border-2 border-[#111116] rounded-xl text-xs space-y-2 animate-fade-in shadow-[2px_2px_0px_#111116]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-primary-600" /> Guide: Obtaining X API Credentials
+                  </span>
+                  <a
+                    href="https://developer.x.com/en/portal/dashboard"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-primary-600 hover:text-primary-700 flex items-center gap-1"
+                  >
+                    Open Developer Portal <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 text-[11px] leading-relaxed">
+                  <li>Log in to <strong className="text-slate-900">developer.x.com</strong> and open your Project / App.</li>
+                  <li>In <strong className="text-slate-900">User authentication settings</strong>, set App Permissions to <strong className="text-slate-900">Read and Write</strong> (Crucial for automated posting!).</li>
+                  <li>Under <strong className="text-slate-900">Keys and tokens</strong>, generate your <strong className="text-slate-900">Consumer Keys (API Key & Secret)</strong>.</li>
+                  <li>Under <strong className="text-slate-900">Authentication Tokens</strong>, generate your <strong className="text-slate-900">Access Token & Secret</strong> paired with your Read & Write access.</li>
+                </ol>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label className="block text-[#111116] font-display font-bold mb-1">API Key (Consumer Key)</label>
@@ -224,6 +263,44 @@ export default function SettingsModal({ isOpen, onClose }) {
               </span>
             </div>
 
+            {/* Guide Toggle */}
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={() => setActiveGuide(activeGuide === 'li' ? null : 'li')}
+                className="text-[11px] text-[#111116] hover:text-[#6a6afe] flex items-center gap-1 font-semibold underline decoration-dotted cursor-pointer"
+              >
+                <BookOpen className="w-3 h-3 text-[#6a6afe]" />
+                <span>{activeGuide === 'li' ? 'Hide documentation' : 'How to get LinkedIn Token & URN'}</span>
+                {activeGuide === 'li' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            </div>
+
+            {/* LinkedIn Guide Drawer */}
+            {activeGuide === 'li' && (
+              <div className="p-3.5 bg-white border-2 border-[#111116] rounded-xl text-xs space-y-2 animate-fade-in shadow-[2px_2px_0px_#111116]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-[#0a66c2]" /> Guide: LinkedIn OAuth Token & Author URN
+                  </span>
+                  <a
+                    href="https://www.linkedin.com/developers/apps"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-[#0a66c2] hover:underline flex items-center gap-1"
+                  >
+                    Open LinkedIn Developers <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 text-[11px] leading-relaxed">
+                  <li>Go to <strong className="text-slate-900">linkedin.com/developers/apps</strong> and create an App.</li>
+                  <li>In the <strong className="text-slate-900">Products</strong> tab, request access to <strong className="text-slate-900">Share on LinkedIn</strong> and <strong className="text-slate-900">Sign In with LinkedIn using OpenID Connect</strong> (enables <code className="bg-slate-100 px-1 rounded">w_member_social</code>).</li>
+                  <li>Use the <strong className="text-slate-900">Token Generator tool</strong> in the Developer Portal to generate your 60-day OAuth Access Token.</li>
+                  <li><strong className="text-slate-900">Author URN:</strong> Format is <code className="bg-slate-100 px-1 rounded">urn:li:person:YOUR_ID</code> (e.g. <code className="bg-slate-100 px-1 rounded">urn:li:person:XK-FFGXYeP</code>) or for organization pages <code className="bg-slate-100 px-1 rounded">urn:li:organization:123456</code>.</li>
+                </ol>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label className="block text-[#111116] font-display font-bold mb-1">OAuth Access Token</label>
@@ -276,6 +353,45 @@ export default function SettingsModal({ isOpen, onClose }) {
               </span>
             </div>
 
+            {/* Guide Toggle */}
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={() => setActiveGuide(activeGuide === 'ig' ? null : 'ig')}
+                className="text-[11px] text-[#111116] hover:text-[#6a6afe] flex items-center gap-1 font-semibold underline decoration-dotted cursor-pointer"
+              >
+                <BookOpen className="w-3 h-3 text-[#6a6afe]" />
+                <span>{activeGuide === 'ig' ? 'Hide documentation' : 'How to get Instagram Token & Account ID'}</span>
+                {activeGuide === 'ig' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            </div>
+
+            {/* Instagram Guide Drawer */}
+            {activeGuide === 'ig' && (
+              <div className="p-3.5 bg-white border-2 border-[#111116] rounded-xl text-xs space-y-2 animate-fade-in shadow-[2px_2px_0px_#111116]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-pink-600" /> Guide: Instagram Graph API Token & Account ID
+                  </span>
+                  <a
+                    href="https://developers.facebook.com/apps"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-pink-600 hover:underline flex items-center gap-1"
+                  >
+                    Open Meta Developers <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 text-[11px] leading-relaxed">
+                  <li>Ensure your Instagram account is switched to a <strong className="text-slate-900">Professional (Business or Creator)</strong> account.</li>
+                  <li>In <strong className="text-slate-900">developers.facebook.com/apps</strong> &rarr; Create App &rarr; Choose type <strong className="text-slate-900">Other</strong> &rarr; Add <strong className="text-slate-900">Instagram Graph API</strong>.</li>
+                  <li>Under App Dashboard &rarr; Tools &rarr; <strong className="text-slate-900">Graph API Explorer</strong>, select your app and request: <code className="bg-slate-100 px-1 rounded">instagram_basic</code> and <code className="bg-slate-100 px-1 rounded">instagram_content_publish</code>.</li>
+                  <li>Click <strong className="text-slate-900">Generate Access Token</strong> and paste the token above.</li>
+                  <li><strong className="text-slate-900">Account ID:</strong> Run <code className="bg-slate-100 px-1 rounded">GET /me?fields=id,username</code> with your token to see your Instagram Account ID (e.g. <code className="bg-slate-100 px-1 rounded">28960740636950255</code>).</li>
+                </ol>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div>
                 <label className="block text-[#111116] font-display font-bold mb-1">Graph API Access Token</label>
@@ -283,7 +399,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                   type={showTokens ? 'text' : 'password'}
                   value={igAccessToken}
                   onChange={(e) => setIgAccessToken(e.target.value)}
-                  placeholder="EAABw..."
+                  placeholder="EAABw... or IGAAT..."
                   className="w-full bg-white border-2 border-[#111116] focus:border-[#dc2743] rounded-xl px-3 py-2 text-[#111116] text-xs font-mono focus:outline-none"
                 />
               </div>
@@ -293,7 +409,7 @@ export default function SettingsModal({ isOpen, onClose }) {
                   type="text"
                   value={igAccountId}
                   onChange={(e) => setIgAccountId(e.target.value)}
-                  placeholder="178414000000000"
+                  placeholder="28960740636950255"
                   className="w-full bg-white border-2 border-[#111116] focus:border-[#dc2743] rounded-xl px-3 py-2 text-[#111116] text-xs font-mono focus:outline-none"
                 />
               </div>
@@ -325,6 +441,43 @@ export default function SettingsModal({ isOpen, onClose }) {
                 )}
               </span>
             </div>
+
+            {/* Guide Toggle */}
+            <div className="flex justify-start">
+              <button
+                type="button"
+                onClick={() => setActiveGuide(activeGuide === 'gemini' ? null : 'gemini')}
+                className="text-[11px] text-[#111116] hover:text-[#6a6afe] flex items-center gap-1 font-semibold underline decoration-dotted cursor-pointer"
+              >
+                <BookOpen className="w-3 h-3 text-[#ff6a91]" />
+                <span>{activeGuide === 'gemini' ? 'Hide documentation' : 'How to get free Gemini API Key'}</span>
+                {activeGuide === 'gemini' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+            </div>
+
+            {/* Gemini Guide Drawer */}
+            {activeGuide === 'gemini' && (
+              <div className="p-3.5 bg-white border-2 border-[#111116] rounded-xl text-xs space-y-2 animate-fade-in shadow-[2px_2px_0px_#111116]">
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                  <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-pink-500" /> Guide: Google Gemini API Key
+                  </span>
+                  <a
+                    href="https://aistudio.google.com/app/apikey"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                  >
+                    Open Google AI Studio <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+                <ol className="list-decimal list-inside space-y-1 text-slate-700 text-[11px] leading-relaxed">
+                  <li>Navigate to <strong className="text-slate-900">aistudio.google.com/app/apikey</strong> and sign in with your Google account.</li>
+                  <li>Click the blue <strong className="text-slate-900">Create API Key</strong> button (Free quota included).</li>
+                  <li>Select or create a Google Cloud project, then copy your generated key (starts with <code className="bg-slate-100 px-1 rounded">AIzaSy...</code>) and paste it below.</li>
+                </ol>
+              </div>
+            )}
 
             <div className="text-xs">
               <label className="block text-[#111116] font-display font-bold mb-1">AI Engine API Key</label>

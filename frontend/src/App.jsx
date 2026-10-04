@@ -11,7 +11,9 @@ import {
   Sliders,
   ChevronRight,
   Layers,
-  MessageSquare
+  MessageSquare,
+  BarChart2,
+  TrendingUp
 } from 'lucide-react';
 import Composer from './components/Composer';
 import XPreview from './components/XPreview';
@@ -20,6 +22,8 @@ import InstagramPreview from './components/InstagramPreview';
 import ScheduledQueue from './components/ScheduledQueue';
 import PostHistory from './components/PostHistory';
 import SettingsModal from './components/SettingsModal';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
+import MediaAdvisorBot from './components/MediaAdvisorBot';
 import { getPosts, getHealth, getSettings } from './api/client';
 
 export default function App() {
@@ -137,6 +141,18 @@ export default function App() {
             <span className={`w-2 h-2 rounded-full ${activeView === 'history' ? 'bg-[#111116]' : 'bg-[#6CEBB0]'}`} />
             <span>Published Feed & Engagement</span>
           </button>
+
+          <button
+            onClick={() => setActiveView('analytics')}
+            className={`px-4 py-1.5 rounded-full text-xs font-display font-bold flex items-center gap-2 transition-all cursor-pointer ${
+              activeView === 'analytics'
+                ? 'bg-[#ffe400] text-[#111116] shadow-[2px_2px_0px_#111116]'
+                : 'text-[#111116] hover:bg-[#fef7e6]'
+            }`}
+          >
+            <BarChart2 className={`w-3.5 h-3.5 ${activeView === 'analytics' ? 'text-[#111116]' : 'text-[#ff6a91]'}`} />
+            <span>Performance & Analytics</span>
+          </button>
         </nav>
 
         {/* Action Controls & Gateways Button */}
@@ -223,6 +239,13 @@ export default function App() {
           >
             Engagement Stream
           </button>
+
+          <button
+            onClick={() => setActiveView('analytics')}
+            className="px-7 py-3 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
+          >
+            Performance Analytics
+          </button>
         </div>
       </section>
 
@@ -262,6 +285,14 @@ export default function App() {
               }`}
             >
               Feed & Engagement
+            </button>
+            <button
+              onClick={() => setActiveView('analytics')}
+              className={`px-4 py-2 rounded-full text-xs font-display font-bold border-2 border-[#111116] ${
+                activeView === 'analytics' ? 'bg-[#ffe400] text-[#111116] shadow-[2px_2px_0px_#111116]' : 'bg-white'
+              }`}
+            >
+              Analytics
             </button>
           </div>
 
@@ -433,6 +464,16 @@ export default function App() {
             />
           )}
 
+          {/* PERFORMANCE & ANALYTICS VIEW */}
+          {activeView === 'analytics' && (
+            <AnalyticsDashboard
+              onNavigateToComposer={() => {
+                setActiveView('studio');
+                window.scrollTo({ top: 380, behavior: 'smooth' });
+              }}
+            />
+          )}
+
         </div>
       </section>
 
@@ -505,6 +546,9 @@ export default function App() {
           fetchInitialData();
         }}
       />
+
+      {/* Floating AI Social Media Advisor Bot */}
+      <MediaAdvisorBot />
     </div>
   );
 }

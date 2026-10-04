@@ -247,3 +247,155 @@ Respond STRICTLY in JSON format:
         print(f"Error in suggest_reply_with_gemini: {e}")
         return default_fallbacks
 
+
+async def advise_social_media_with_gemini(
+    query: str,
+    conversation_history: Optional[List[Dict[str, str]]] = None
+) -> Dict[str, Any]:
+    """
+    Expert Social Media Marketing & Growth Advisor bot powered by Gemini.
+    Answers questions about engagement, captions, algorithm tips, timing, and strategy.
+    """
+    clean_query = query.strip()
+    if not clean_query:
+        return {
+            "reply": "Please ask a question about caption writing, engagement tactics, or social media growth!",
+            "suggested_followups": [
+                "How do I write a high-converting hook?",
+                "What is the best posting cadence?",
+                "How to get more comments on Instagram?"
+            ]
+        }
+
+    # Curated knowledge fallback if Gemini is unreachable or offline
+    offline_fallbacks = {
+        "caption": (
+            "### ✍️ High-Impact Caption Framework (AIDA):\n\n"
+            "1. **The Hook (First 1-2 lines)**: Stop the scroll with a curiosity gap, counter-intuitive insight, or bold statement. Avoid fluff.\n"
+            "2. **The Context / Story**: Share the concrete lesson or specific detail in short, readable 1-2 sentence paragraphs.\n"
+            "3. **The Value / Takeaway**: Bullet points of actionable takeaways your audience can apply today.\n"
+            "4. **The CTA (Call to Action)**: Ask an open-ended question that prompts easy replies (e.g., *'Which of these do you use daily?'*)."
+        ),
+        "engagement": (
+            "### 🚀 5 Proven Tactics to Skyrocket Social Engagement:\n\n"
+            "- **The Golden 60 Minutes**: Reply to all comments within the first hour of posting to trigger platform algorithm boosts.\n"
+            "- **Conversation Starters**: End every post with a specific binary or personal question, not generic statements.\n"
+            "- **Visual Teasers**: Include a clean, high-contrast image or carousel—visuals retain attention 3x longer than pure text.\n"
+            "- **Tag & Credit Strategically**: Mention collaborators or industry leaders thoughtfully to stimulate reposts.\n"
+            "- **Platform-Specific Format**: Keep X punchy (<250 chars), LinkedIn structured with bullet spacing, and Instagram visual with aesthetic emojis."
+        ),
+        "default": (
+            f"### 💡 Social Strategy Insight:\n\n"
+            f"To maximize results for **'{clean_query}'**:\n\n"
+            "- **Consistency over volume**: Posting 3-4 ultra-high-value posts weekly consistently outperforms 14 low-effort posts.\n"
+            "- **Optimize for saves & shares**: The modern algorithms (especially Instagram & LinkedIn) prioritize content that people bookmark or repost over simple likes.\n"
+            "- **Test 3 different hooks**: The same idea can 10x its reach simply by testing different opening lines.\n\n"
+            "*Tip: Use our AI Optimize tool in the Composer to automatically tailor your message for X, LinkedIn, and Instagram in 1 click!*"
+        )
+    }
+
+    if not settings.GEMINI_API_KEY:
+        chosen_reply = offline_fallbacks["caption"] if "caption" in clean_query.lower() else (
+            offline_fallbacks["engagement"] if "engage" in clean_query.lower() else offline_fallbacks["default"]
+        )
+        return {
+            "reply": chosen_reply,
+            "suggested_followups": [
+                "What are the best hook formulas for LinkedIn?",
+                "How many hashtags should I use on Instagram?",
+                "What's the best time to publish on X?"
+            ]
+        }
+
+    try:
+        from google import genai
+        from google.genai import types
+
+        client = genai.Client(api_key=settings.GEMINI_API_KEY.strip())
+
+        system_instruction = """
+You are the elite "Doooing Social Media Advisor" AI built into Social Pulse Studio.
+You specialize in social media copywriting, engagement optimization, organic growth algorithms, and distribution strategies for:
+1. X (Twitter): Viral hooks, threads, engagement velocity, character efficiency.
+2. LinkedIn: Thought leadership, professional storytelling, clean line formatting, comment reciprocity.
+3. Instagram: Aesthetic captions, Carousel narrative arcs, Reels retention hooks, hashtag grouping.
+
+Your style:
+- Authoritative, concise, energizing, modern, practical.
+- Use clean Markdown with headers (###), bold key terms, and bullet points.
+- Always provide specific formulas or concrete before-and-after examples when explaining concepts.
+- Keep answers tightly structured (under 300 words).
+"""
+
+        prompt = f"""
+{system_instruction}
+
+User Question:
+\"{clean_query}\"
+
+Respond STRICTLY in JSON format with this exact structure:
+{{
+  "reply": "Markdown formatted advice with clear actionable steps, examples, and bullet points",
+  "suggested_followups": [
+    "Short followup question 1",
+    "Short followup question 2",
+    "Short followup question 3"
+  ]
+}}
+"""
+        models_to_try = ["gemini-3.5-flash-lite", "gemini-3.8-flash"]
+        for model_name in models_to_try:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json"
+                    )
+                )
+                if response and response.text:
+                    clean_text = response.text.strip()
+                    if clean_text.startswith("```json"):
+                        clean_text = clean_text[7:]
+                    if clean_text.startswith("```"):
+                        clean_text = clean_text[3:]
+                    if clean_text.endswith("```"):
+                        clean_text = clean_text[:-3]
+
+                    data = json.loads(clean_text)
+                    reply_text = data.get("reply", "")
+                    followups = data.get("suggested_followups", [])
+                    if reply_text:
+                        return {
+                            "reply": reply_text,
+                            "suggested_followups": followups[:3] if followups else [
+                                "How do I write a viral hook?",
+                                "What's the best hashtag strategy?",
+                                "How to increase LinkedIn comments?"
+                            ]
+                        }
+            except Exception as model_err:
+                print(f"Social Advisor model {model_name} error: {model_err}")
+
+        # Fallback if API response parsing failed
+        return {
+            "reply": offline_fallbacks["default"],
+            "suggested_followups": [
+                "Give me 5 viral hook formulas",
+                "How to optimize Instagram captions",
+                "Best times to post on LinkedIn"
+            ]
+        }
+
+    except Exception as e:
+        print(f"Error in advise_social_media_with_gemini: {e}")
+        return {
+            "reply": offline_fallbacks["default"],
+            "suggested_followups": [
+                "Give me 5 viral hook formulas",
+                "How to optimize Instagram captions",
+                "Best times to post on LinkedIn"
+            ]
+        }
+
+

@@ -145,3 +145,40 @@ class AISuggestReplyRequest(BaseModel):
 class AISuggestReplyResponse(BaseModel):
     suggestions: List[str] = []
 
+
+class SocialAdvisorRequest(BaseModel):
+    query: str
+    history: Optional[List[dict]] = None
+
+
+class SocialAdvisorResponse(BaseModel):
+    reply: str
+    suggested_followups: List[str] = []
+
+
+class PlatformStatSummary(BaseModel):
+    platform: str
+    connected: bool
+    handle_or_name: str
+    total_posts: int = 0
+    total_likes: int = 0
+    total_comments: int = 0
+    total_shares: int = 0
+    estimated_reach: int = 0
+
+
+class AnalyticsOverviewResponse(BaseModel):
+    total_posts: int
+    published_count: int
+    scheduled_count: int
+    draft_count: int
+    total_likes: int
+    total_comments: int
+    total_shares: int
+    total_impressions: int
+    avg_engagement_rate: float
+    platform_stats: List[PlatformStatSummary]
+    top_posts: List[dict] = []
+    weekly_activity: List[dict] = []
+
+

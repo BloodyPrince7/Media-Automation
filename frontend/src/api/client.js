@@ -89,5 +89,16 @@ export const aiSuggestReply = async (payload) => {
   return res.data;
 };
 
+export const askMediaAdvisor = async (query, history = []) => {
+  const res = await api.post('/ai/media-advisor', { query, history });
+  return res.data;
+};
+
+export const getAnalyticsOverview = async () => {
+  const res = await api.get('/analytics/overview');
+  return res.data;
+};
+
 export default api;
+
 
