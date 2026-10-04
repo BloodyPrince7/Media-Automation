@@ -3,7 +3,6 @@ from typing import List, Optional
 import tweepy
 from app.config import settings
 from app.publishers.base import BasePublisher, ValidationResult, PublishResult
-from app.publishers.mock_publisher import simulate_publish
 
 class TwitterPublisher(BasePublisher):
     MAX_CHARS = 280
@@ -46,8 +45,7 @@ class TwitterPublisher(BasePublisher):
     async def publish(
         self,
         text: str,
-        media_urls: Optional[List[str]] = None,
-        mock_mode: bool = False
+        media_urls: Optional[List[str]] = None
     ) -> PublishResult:
         media_urls = media_urls or []
 
@@ -60,14 +58,13 @@ class TwitterPublisher(BasePublisher):
                 error_message="; ".join(val.errors)
             )
 
-        # Check simulation mode or unconfigured keys
-        if mock_mode or not self.is_configured():
-            if not mock_mode and not self.is_configured():
-                # Provide simulated post with warning flag if user forgot keys
-                result = simulate_publish("x", text)
-                result.error_message = "Published in Simulation Mode: X credentials not configured in settings."
-                return result
-            return simulate_publish("x", text)
+        # Check configured keys
+        if not self.is_configured():
+            return PublishResult(
+                success=False,
+                platform="x",
+                error_message="X API credentials not configured. Please add your API Key, Secret, and Access Tokens in Settings."
+            )
 
         # Live Twitter API v2 publishing with Tweepy
         try:

@@ -35,7 +35,6 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       }
       if (selectedPostToEdit.scheduled_at) {
         setIsScheduling(true);
-        // format ISO to datetime-local input string
         try {
           const d = new Date(selectedPostToEdit.scheduled_at);
           setScheduledAt(d.toISOString().slice(0, 16));
@@ -73,7 +72,7 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
 
   const handleAIAdapt = async () => {
     if (!content.trim()) {
-      setStatusMessage({ type: 'error', text: 'Enter a draft or thought first to adapt with AI.' });
+      setStatusMessage({ type: 'error', text: 'Enter a draft or topic first to format with AI.' });
       return;
     }
     setIsAdaptingAI(true);
@@ -86,10 +85,10 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       setCustomOverrides(true);
       setXContent(res.x_text);
       setLinkedinContent(res.linkedin_text);
-      setStatusMessage({ type: 'success', text: 'Adapted tailored versions for X and LinkedIn!' });
+      setStatusMessage({ type: 'success', text: 'Synthesized tailored drafts for X and LinkedIn!' });
     } catch (err) {
       console.error(err);
-      setStatusMessage({ type: 'error', text: 'Failed to adapt content via AI service.' });
+      setStatusMessage({ type: 'error', text: 'Failed to format content via AI service.' });
     } finally {
       setIsAdaptingAI(false);
     }
@@ -103,7 +102,7 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
     }
 
     if (isScheduling && !scheduledAt && !publishImmediately) {
-      setStatusMessage({ type: 'error', text: 'Please pick a date & time for scheduled publishing.' });
+      setStatusMessage({ type: 'error', text: 'Please select a date & time for scheduled publishing.' });
       return;
     }
 
@@ -125,10 +124,10 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
       const newPost = await createPost(payload);
       setStatusMessage({
         type: 'success',
-        text: publishImmediately ? 'Broadcast triggered successfully!' : 'Post saved & scheduled successfully!'
+        text: publishImmediately ? 'Post dispatched to target networks!' : 'Post scheduled successfully!'
       });
 
-      // Reset form if immediate or scheduled
+      // Reset form
       setContent('');
       setXContent('');
       setLinkedinContent('');
@@ -153,85 +152,91 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
   };
 
   return (
-    <div className="bg-[#12141c] border border-neutral-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
-      {/* Platform Target Selection Bar */}
-      <div className="flex items-center justify-between border-b border-neutral-800/80 pb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-wider font-semibold text-neutral-400 font-mono">
-            Publish To:
+    <div className="bg-[#0b0c14]/90 border border-white/[0.08] rounded-3xl p-6 sm:p-7 shadow-2xl flex flex-col gap-5 backdrop-blur-xl relative overflow-hidden">
+      {/* Target Networks Selection Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="text-xs uppercase tracking-wider font-bold text-neutral-400 font-mono">
+            Networks:
           </span>
+
+          {/* X (Twitter) Target Button */}
           <button
             type="button"
             onClick={() => togglePlatform('x')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
               targetPlatforms.includes('x')
-                ? 'bg-neutral-800 text-white border border-neutral-700'
-                : 'bg-neutral-900/50 text-neutral-500 border border-neutral-800/50 hover:border-neutral-700'
+                ? 'bg-[#00f2fe]/15 text-[#00f2fe] border border-[#00f2fe]/60 shadow-[0_0_15px_rgba(0,242,254,0.25)]'
+                : 'bg-white/[0.03] text-neutral-400 border border-white/[0.08] hover:border-neutral-600'
             }`}
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
             <span>X (Twitter)</span>
-            {targetPlatforms.includes('x') && <Check className="w-3.5 h-3.5 text-neutral-300" />}
+            {targetPlatforms.includes('x') && <Check className="w-3.5 h-3.5 text-[#00f2fe]" />}
           </button>
 
+          {/* LinkedIn Target Button */}
           <button
             type="button"
             onClick={() => togglePlatform('linkedin')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all ${
+            className={`px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
               targetPlatforms.includes('linkedin')
-                ? 'bg-[#0a66c2]/20 text-[#70b5f8] border border-[#0a66c2]/40'
-                : 'bg-neutral-900/50 text-neutral-500 border border-neutral-800/50 hover:border-neutral-700'
+                ? 'bg-[#a855f7]/15 text-violet-300 border border-[#a855f7]/60 shadow-[0_0_15px_rgba(168,85,247,0.25)]'
+                : 'bg-white/[0.03] text-neutral-400 border border-white/[0.08] hover:border-neutral-600'
             }`}
           >
             <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
               <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
             </svg>
             <span>LinkedIn</span>
-            {targetPlatforms.includes('linkedin') && <Check className="w-3.5 h-3.5 text-[#70b5f8]" />}
+            {targetPlatforms.includes('linkedin') && <Check className="w-3.5 h-3.5 text-[#a855f7]" />}
           </button>
         </div>
 
-        {/* AI Format / Adapt Button */}
+        {/* AI Synthesis / Format Button */}
         <button
           type="button"
           onClick={handleAIAdapt}
           disabled={isAdaptingAI || !content.trim()}
-          className="text-xs font-medium px-3 py-1.5 rounded-lg bg-neutral-800/80 hover:bg-neutral-700 text-neutral-200 border border-neutral-700/60 flex items-center gap-1.5 disabled:opacity-50 transition-colors shadow-sm"
-          title="Auto-adapt for X and LinkedIn lengths"
+          className="text-xs font-bold px-4 py-1.5 rounded-full border border-[#ff3b8f]/50 bg-gradient-to-r from-[#ff3b8f]/20 via-[#a855f7]/20 to-[#00f2fe]/20 hover:from-[#ff3b8f]/40 hover:to-[#00f2fe]/40 text-white flex items-center gap-1.5 disabled:opacity-40 transition-all shadow-[0_0_15px_rgba(255,59,143,0.25)] cursor-pointer"
         >
           {isAdaptingAI ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <Sparkles className="w-3.5 h-3.5 text-[#ff3b8f]" />
           )}
           <span>Format with AI</span>
         </button>
       </div>
 
-      {/* Editor Tabs if overrides enabled */}
+      {/* Editor Tabs if platform overrides active */}
       {customOverrides && (
-        <div className="flex items-center gap-1 bg-neutral-900/60 p-1 rounded-lg border border-neutral-800 text-xs">
+        <div className="flex items-center gap-1.5 bg-[#07080d] p-1.5 rounded-full border border-white/[0.08] text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('master')}
-            className={`px-3 py-1 rounded-md font-medium transition-colors ${
-              activeTab === 'master' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+            className={`px-4 py-1.5 rounded-full font-semibold transition-all ${
+              activeTab === 'master'
+                ? 'bg-gradient-to-r from-[#ff3b8f] to-[#a855f7] text-white shadow-md'
+                : 'text-neutral-400 hover:text-white'
             }`}
           >
-            Universal Master
+            Master Draft
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('x')}
-            className={`px-3 py-1 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
-              activeTab === 'x' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+            className={`px-4 py-1.5 rounded-full font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === 'x'
+                ? 'bg-[#00f2fe]/20 text-[#00f2fe] border border-[#00f2fe]/50 shadow-sm'
+                : 'text-neutral-400 hover:text-[#00f2fe]'
             }`}
           >
-            <span>X Draft</span>
-            <span className={`text-[10px] px-1 rounded ${
-              xContent.length > 280 ? 'bg-rose-500/20 text-rose-400' : 'text-neutral-400'
+            <span>X (Twitter)</span>
+            <span className={`text-[10px] font-mono px-1.5 rounded-full ${
+              xContent.length > 280 ? 'bg-rose-500/30 text-rose-300' : 'text-neutral-400'
             }`}>
               {xContent.length}/280
             </span>
@@ -239,12 +244,14 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
           <button
             type="button"
             onClick={() => setActiveTab('linkedin')}
-            className={`px-3 py-1 rounded-md font-medium flex items-center gap-1.5 transition-colors ${
-              activeTab === 'linkedin' ? 'bg-neutral-800 text-white' : 'text-neutral-400 hover:text-white'
+            className={`px-4 py-1.5 rounded-full font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === 'linkedin'
+                ? 'bg-[#a855f7]/20 text-violet-300 border border-[#a855f7]/50 shadow-sm'
+                : 'text-neutral-400 hover:text-violet-300'
             }`}
           >
-            <span>LinkedIn Draft</span>
-            <span className="text-[10px] text-neutral-400">
+            <span>LinkedIn</span>
+            <span className="text-[10px] font-mono text-neutral-400">
               {linkedinContent.length}/3000
             </span>
           </button>
@@ -258,8 +265,8 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={5}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="What's happening? Compose your post here to broadcast across X & LinkedIn..."
-            className="w-full bg-neutral-950/70 border border-neutral-800 focus:border-neutral-600 rounded-xl p-3.5 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-700 transition-all resize-y"
+            placeholder="Share your message or update here to broadcast across X & LinkedIn..."
+            className="w-full bg-[#05060a] border border-white/[0.08] focus:border-[#00f2fe]/60 rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#00f2fe]/30 transition-all resize-y shadow-inner"
           />
         )}
         {activeTab === 'x' && (
@@ -267,8 +274,8 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={5}
             value={xContent}
             onChange={(e) => setXContent(e.target.value)}
-            placeholder="Custom draft tailored specifically for X (Twitter) (Max 280 characters)..."
-            className="w-full bg-neutral-950/70 border border-neutral-800 focus:border-neutral-600 rounded-xl p-3.5 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-700 transition-all resize-y"
+            placeholder="Tailor specifically for X (Punchy hook, hashtags, under 280 chars)..."
+            className="w-full bg-[#05060a] border border-[#00f2fe]/40 focus:border-[#00f2fe] rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#00f2fe]/40 transition-all resize-y shadow-inner"
           />
         )}
         {activeTab === 'linkedin' && (
@@ -276,23 +283,32 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
             rows={6}
             value={linkedinContent}
             onChange={(e) => setLinkedinContent(e.target.value)}
-            placeholder="Custom draft tailored specifically for LinkedIn (Professional hook, takeaways, hashtags)..."
-            className="w-full bg-neutral-950/70 border border-neutral-800 focus:border-neutral-600 rounded-xl p-3.5 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-neutral-700 transition-all resize-y"
+            placeholder="Tailor specifically for LinkedIn (Professional narrative, bullet takeaways, call-to-action)..."
+            className="w-full bg-[#05060a] border border-[#a855f7]/40 focus:border-[#a855f7] rounded-2xl p-4 text-neutral-100 placeholder-neutral-500 text-sm focus:outline-none focus:ring-1 focus:ring-[#a855f7]/40 transition-all resize-y shadow-inner"
           />
         )}
 
-        {/* Character Metrics Footer */}
+        {/* Character Metrics & Override Toggle */}
         <div className="flex items-center justify-between text-xs text-neutral-400 mt-2 px-1">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1 font-mono">
-              <span className="text-neutral-500">X:</span>
-              <span className={effectiveXText.length > 280 ? 'text-rose-400 font-bold' : 'text-neutral-300'}>
+            <span className="flex items-center gap-1.5 font-mono">
+              <span className="text-neutral-400 font-semibold">X:</span>
+              <span className={`font-bold ${
+                effectiveXText.length > 280
+                  ? 'text-rose-400'
+                  : 'text-[#00f2fe]'
+              }`}>
                 {effectiveXText.length}/280
               </span>
             </span>
-            <span className="flex items-center gap-1 font-mono">
-              <span className="text-neutral-500">LinkedIn:</span>
-              <span className={effectiveLiText.length > 3000 ? 'text-rose-400 font-bold' : 'text-neutral-300'}>
+
+            <span className="flex items-center gap-1.5 font-mono">
+              <span className="text-neutral-400 font-semibold">LinkedIn:</span>
+              <span className={`font-bold ${
+                effectiveLiText.length > 3000
+                  ? 'text-rose-400'
+                  : 'text-violet-400'
+              }`}>
                 {effectiveLiText.length}/3000
               </span>
             </span>
@@ -307,10 +323,10 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
               }
               setCustomOverrides(!customOverrides);
             }}
-            className="text-xs text-neutral-400 hover:text-neutral-200 flex items-center gap-1 transition-colors"
+            className="text-xs text-neutral-400 hover:text-white flex items-center gap-1.5 transition-colors font-medium cursor-pointer"
           >
-            <Layers className="w-3.5 h-3.5" />
-            <span>{customOverrides ? 'Use Single Master Post' : 'Customize per platform'}</span>
+            <Layers className="w-3.5 h-3.5 text-[#ff3b8f]" />
+            <span>{customOverrides ? 'Revert to Single Master Draft' : 'Customize per platform'}</span>
           </button>
         </div>
       </div>
@@ -323,57 +339,57 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
 
       {/* Schedule Picker Bar */}
       {isScheduling && (
-        <div className="bg-neutral-900/60 border border-neutral-800 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-neutral-300">
-            <Clock className="w-4 h-4 text-emerald-400" />
-            <span className="font-medium">Scheduled publication time:</span>
+        <div className="bg-[#05060a] border border-[#00f2fe]/30 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-md">
+          <div className="flex items-center gap-2 text-cyan-300">
+            <Clock className="w-4 h-4 text-[#00f2fe]" />
+            <span className="font-semibold">Scheduled Broadcast Time:</span>
           </div>
           <input
             type="datetime-local"
             value={scheduledAt}
             onChange={(e) => setScheduledAt(e.target.value)}
-            className="bg-neutral-950 border border-neutral-700 rounded-lg px-3 py-1.5 text-neutral-100 text-xs focus:outline-none focus:ring-1 focus:ring-neutral-500"
+            className="bg-[#0c0e18] border border-white/[0.1] rounded-xl px-3 py-1.5 text-neutral-100 text-xs focus:outline-none focus:ring-1 focus:ring-[#00f2fe] font-mono"
           />
         </div>
       )}
 
       {/* Feedback Alert */}
       {statusMessage && (
-        <div className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
+        <div className={`p-3.5 rounded-2xl text-xs flex items-center gap-2.5 border shadow-sm ${
           statusMessage.type === 'error'
-            ? 'bg-rose-950/30 border-rose-800/40 text-rose-300'
-            : 'bg-emerald-950/30 border-emerald-800/40 text-emerald-300'
+            ? 'bg-rose-950/40 border-rose-500/40 text-rose-300'
+            : 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300'
         }`}>
           {statusMessage.type === 'error' ? (
             <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
           ) : (
             <Check className="w-4 h-4 shrink-0 text-emerald-400" />
           )}
-          <span>{statusMessage.text}</span>
+          <span className="font-medium">{statusMessage.text}</span>
         </div>
       )}
 
       {/* Action Footer */}
-      <div className="flex items-center justify-between pt-2 border-t border-neutral-800/80">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+        <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setIsScheduling(!isScheduling)}
-            className={`px-3 py-2 rounded-xl text-xs font-medium border flex items-center gap-1.5 transition-colors ${
+            className={`px-4 py-2 rounded-full text-xs font-semibold border flex items-center gap-2 transition-all cursor-pointer ${
               isScheduling
-                ? 'bg-neutral-800 border-neutral-700 text-emerald-400'
-                : 'bg-transparent border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:border-neutral-700'
+                ? 'bg-[#00f2fe]/20 border-[#00f2fe]/60 text-[#00f2fe] shadow-[0_0_15px_rgba(0,242,254,0.3)]'
+                : 'bg-white/[0.03] border-white/[0.08] text-neutral-400 hover:text-white hover:border-white/20'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span>{isScheduling ? 'Schedule Active' : 'Schedule for later'}</span>
+            <span>{isScheduling ? 'Schedule Active' : 'Schedule'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleSubmit(false)}
             disabled={isSubmitting}
-            className="px-3 py-2 rounded-xl text-xs font-medium bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:border-neutral-700 transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded-full text-xs font-semibold bg-white/[0.04] border border-white/[0.08] text-neutral-300 hover:text-white hover:bg-white/[0.08] transition-all disabled:opacity-40 cursor-pointer"
           >
             Save Draft
           </button>
@@ -383,21 +399,21 @@ export default function Composer({ onPostCreated, selectedPostToEdit = null, onD
           type="button"
           onClick={() => handleSubmit(isScheduling ? false : true)}
           disabled={isSubmitting || (effectiveXText.length > 280 && targetPlatforms.includes('x'))}
-          className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-md ${
+          className={`px-7 py-2.5 rounded-full text-xs font-black flex items-center gap-2 transition-all cursor-pointer ${
             isScheduling
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-              : 'bg-white hover:bg-neutral-200 text-neutral-950'
+              ? 'border border-[#00f2fe] bg-gradient-to-r from-[#00f2fe]/20 to-[#a855f7]/20 hover:from-[#00f2fe]/40 hover:to-[#a855f7]/40 text-white shadow-[0_0_20px_rgba(0,242,254,0.35)]'
+              : 'border border-[#ff3b8f] bg-gradient-to-r from-[#ff3b8f]/30 via-[#a855f7]/30 to-[#00f2fe]/30 hover:from-[#ff3b8f]/50 hover:to-[#00f2fe]/50 text-white shadow-[0_0_25px_rgba(255,59,143,0.4)]'
           } disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           {isScheduling ? (
             <>
-              <Clock className="w-4 h-4" />
+              <Clock className="w-4 h-4 text-[#00f2fe]" />
               <span>{isSubmitting ? 'Scheduling...' : 'Confirm Schedule'}</span>
             </>
           ) : (
             <>
-              <Send className="w-4 h-4" />
-              <span>{isSubmitting ? 'Publishing...' : 'Publish Now'}</span>
+              <Send className="w-4 h-4 text-[#ff3b8f]" />
+              <span>{isSubmitting ? 'Dispatching...' : 'Publish Now'}</span>
             </>
           )}
         </button>

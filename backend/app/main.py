@@ -55,7 +55,6 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 def health_check():
     return {
         "status": "online",
-        "mock_mode": settings.MOCK_MODE,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
@@ -221,7 +220,6 @@ async def ai_adapt(req: AIAdaptRequest):
 @app.get("/api/settings", response_model=SettingsOut)
 def get_settings():
     return SettingsOut(
-        mock_mode=settings.MOCK_MODE,
         has_x_credentials=bool(settings.X_API_KEY and settings.X_ACCESS_TOKEN),
         has_linkedin_credentials=bool(settings.LINKEDIN_ACCESS_TOKEN and settings.LINKEDIN_AUTHOR_URN),
         has_gemini_credentials=bool(settings.GEMINI_API_KEY),
@@ -231,8 +229,6 @@ def get_settings():
 
 @app.post("/api/settings")
 def update_settings(update: SettingsUpdate):
-    if update.mock_mode is not None:
-        settings.MOCK_MODE = update.mock_mode
     if update.x_api_key is not None:
         settings.X_API_KEY = update.x_api_key
     if update.x_api_secret is not None:
@@ -252,7 +248,6 @@ def update_settings(update: SettingsUpdate):
 
     return {
         "message": "Settings updated",
-        "mock_mode": settings.MOCK_MODE,
         "has_x_credentials": bool(settings.X_API_KEY and settings.X_ACCESS_TOKEN),
         "has_linkedin_credentials": bool(settings.LINKEDIN_ACCESS_TOKEN and settings.LINKEDIN_AUTHOR_URN),
         "has_gemini_credentials": bool(settings.GEMINI_API_KEY)

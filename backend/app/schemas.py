@@ -60,7 +60,6 @@ class PlatformValidationResponse(BaseModel):
     linkedin: ValidationResult
 
 class SettingsOut(BaseModel):
-    mock_mode: bool
     has_x_credentials: bool
     has_linkedin_credentials: bool
     has_gemini_credentials: bool
@@ -68,7 +67,6 @@ class SettingsOut(BaseModel):
     x_handle: Optional[str] = None
 
 class SettingsUpdate(BaseModel):
-    mock_mode: Optional[bool] = None
     x_api_key: Optional[str] = None
     x_api_secret: Optional[str] = None
     x_access_token: Optional[str] = None

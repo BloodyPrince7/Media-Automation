@@ -26,7 +26,6 @@ class BasePublisher(ABC):
     async def publish(
         self,
         text: str,
-        media_urls: Optional[List[str]] = None,
-        mock_mode: bool = False
+        media_urls: Optional[List[str]] = None
     ) -> PublishResult:
         pass

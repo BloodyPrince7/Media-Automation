@@ -7,9 +7,6 @@ UPLOADS_DIR = BASE_DIR / "uploads"
 UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 class Settings(BaseSettings):
-    # App Mode
-    MOCK_MODE: bool = True
-
     # Server settings
     BACKEND_HOST: str = "127.0.0.1"
     BACKEND_PORT: int = 8080

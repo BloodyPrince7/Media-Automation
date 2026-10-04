@@ -2,7 +2,6 @@ from typing import List, Optional
 import httpx
 from app.config import settings
 from app.publishers.base import BasePublisher, ValidationResult, PublishResult
-from app.publishers.mock_publisher import simulate_publish
 
 class LinkedInPublisher(BasePublisher):
     MAX_CHARS = 3000
@@ -35,8 +34,7 @@ class LinkedInPublisher(BasePublisher):
     async def publish(
         self,
         text: str,
-        media_urls: Optional[List[str]] = None,
-        mock_mode: bool = False
+        media_urls: Optional[List[str]] = None
     ) -> PublishResult:
         media_urls = media_urls or []
 
@@ -49,12 +47,12 @@ class LinkedInPublisher(BasePublisher):
                 error_message="; ".join(val.errors)
             )
 
-        if mock_mode or not self.is_configured():
-            if not mock_mode and not self.is_configured():
-                result = simulate_publish("linkedin", text)
-                result.error_message = "Published in Simulation Mode: LinkedIn access token or Author URN not configured."
-                return result
-            return simulate_publish("linkedin", text)
+        if not self.is_configured():
+            return PublishResult(
+                success=False,
+                platform="linkedin",
+                error_message="LinkedIn credentials not configured. Please set your Access Token and Author URN in Settings."
+            )
 
         # Real LinkedIn API call
         try:

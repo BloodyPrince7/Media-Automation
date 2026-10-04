@@ -33,8 +33,7 @@ async def execute_post_publication(post_id: int):
 
                 result = await publisher.publish(
                     text=content,
-                    media_urls=post.media_urls,
-                    mock_mode=settings.MOCK_MODE
+                    media_urls=post.media_urls
                 )
 
                 # Record log
