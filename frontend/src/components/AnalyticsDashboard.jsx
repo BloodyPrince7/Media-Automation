@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
-  Users,
   Heart,
   MessageSquare,
-  Share2,
   Eye,
   BarChart2,
-  Calendar,
   RefreshCw,
   ArrowUpRight,
   Sparkles,
   CheckCircle2,
   Award,
   Layers,
-  Clock
+  Clock,
+  Flame,
+  Zap
 } from 'lucide-react';
 import { getAnalyticsOverview } from '../api/client';
 
@@ -65,11 +64,11 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
-        <div className="w-12 h-12 rounded-2xl bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-600 mb-4 animate-bounce">
+        <div className="w-14 h-14 rounded-full bg-[#ffe400] border-2 border-[#111116] shadow-[4px_4px_0px_#111116] flex items-center justify-center text-[#111116] mb-4 animate-bounce">
           <BarChart2 size={24} />
         </div>
-        <h3 className="text-base font-semibold text-slate-800">Aggregating cross-channel performance...</h3>
-        <p className="text-xs text-slate-400 mt-1">Fetching live statistics from X, LinkedIn & Instagram</p>
+        <h3 className="text-lg font-display font-black text-[#111116]">Aggregating cross-channel performance...</h3>
+        <p className="text-xs text-[#111116]/60 font-medium mt-1">Reading live statistics from X, LinkedIn & Instagram</p>
       </div>
     );
   }
@@ -109,20 +108,20 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
   const totalInteractions = (stats.total_likes || 0) + (stats.total_comments || 0) + (stats.total_shares || 0);
 
   return (
-    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto">
-      {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-gradient-to-br from-primary-100/50 to-indigo-100/40 rounded-full blur-2xl pointer-events-none" />
+    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto text-[#111116]">
+      {/* Top Banner (Doooing Playful Card) */}
+      <div className="bg-[#fdfaf3] border-2 border-[#111116] rounded-[28px] p-6 sm:p-8 shadow-[6px_6px_0px_#111116] relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-[#ffe400]/40 rounded-full border-2 border-[#111116] pointer-events-none" />
 
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-semibold tracking-wider uppercase mb-3">
-            <Sparkles size={12} className="text-primary-400" />
-            Performance & Insights
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111116] text-white text-xs font-display font-black tracking-wider uppercase mb-3 shadow-[2px_2px_0px_#6a6afe]">
+            <Sparkles size={12} className="text-[#ffe400]" />
+            Audience Intelligence
           </div>
-          <h1 className="text-2xl sm:text-3xl font-display font-bold text-slate-900 tracking-tight">
-            Cross-Channel Analytics
+          <h1 className="text-3xl sm:text-4xl font-display font-black text-[#111116] tracking-tight">
+            Cross-Channel Performance
           </h1>
-          <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-xl">
+          <p className="text-[#111116]/75 text-xs sm:text-sm mt-1 max-w-xl font-medium leading-relaxed">
             Real-time audience reach, engagement velocity, and cross-platform breakdown across X, LinkedIn, and Instagram.
           </p>
         </div>
@@ -131,95 +130,95 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all active:scale-95 border border-slate-200"
+            className="neo-btn bg-white hover:bg-[#ffe400] text-[#111116] px-4 py-2 text-xs font-display font-bold flex items-center gap-2 cursor-pointer"
           >
-            <RefreshCw size={14} className={refreshing ? 'animate-spin text-primary-600' : ''} />
+            <RefreshCw size={13} className={refreshing ? 'animate-spin text-[#6a6afe]' : ''} />
             <span>{refreshing ? 'Syncing...' : 'Sync Live Stats'}</span>
           </button>
           {onNavigateToComposer && (
             <button
               onClick={onNavigateToComposer}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold shadow-sm hover:shadow transition-all active:scale-95"
+              className="neo-btn bg-[#6a6afe] text-white px-5 py-2 text-xs font-display font-black flex items-center gap-1.5 shadow-[3px_3px_0px_#111116] cursor-pointer"
             >
-              <span>Create Campaign</span>
+              <span>Compose</span>
               <ArrowUpRight size={14} />
             </button>
           )}
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
+      {/* KPI Stats Grid (Doooing Hard-Shadow Cards) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Estimated Reach */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between group hover:border-primary-200 transition-all">
+        <div className="bg-white border-2 border-[#111116] p-5 rounded-[24px] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Estimated Reach</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <Eye size={16} />
+            <span className="text-xs font-display font-bold text-[#111116]/70 uppercase tracking-wide">Estimated Reach</span>
+            <div className="w-8 h-8 rounded-full bg-[#6a6afe] border-2 border-[#111116] text-white flex items-center justify-center shadow-[1px_1px_0px_#111116]">
+              <Eye size={15} />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
+            <div className="text-3xl font-display font-black text-[#111116]">
               {(stats.total_impressions || 0).toLocaleString()}
             </div>
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-600 font-medium">
+            <div className="flex items-center gap-1 mt-1 text-[11px] text-[#2e7d32] font-display font-bold">
               <TrendingUp size={12} />
-              <span>+18.4% vs last period</span>
+              <span>+18.4% audience lift</span>
             </div>
           </div>
         </div>
 
         {/* Total Interactions */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between group hover:border-primary-200 transition-all">
+        <div className="bg-white border-2 border-[#111116] p-5 rounded-[24px] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Total Engagements</span>
-            <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center">
-              <Heart size={16} />
+            <span className="text-xs font-display font-bold text-[#111116]/70 uppercase tracking-wide">Engagements</span>
+            <div className="w-8 h-8 rounded-full bg-[#ff6a91] border-2 border-[#111116] text-white flex items-center justify-center shadow-[1px_1px_0px_#111116]">
+              <Heart size={15} />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
+            <div className="text-3xl font-display font-black text-[#111116]">
               {totalInteractions.toLocaleString()}
             </div>
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 font-medium">
-              <span>{stats.total_likes || 0} likes · {stats.total_comments || 0} replies</span>
+            <div className="text-[11px] text-[#111116]/70 font-medium mt-1">
+              {stats.total_likes || 0} likes · {stats.total_comments || 0} replies
             </div>
           </div>
         </div>
 
         {/* Engagement Rate */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between group hover:border-primary-200 transition-all">
+        <div className="bg-white border-2 border-[#111116] p-5 rounded-[24px] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Avg. Engagement Rate</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <TrendingUp size={16} />
+            <span className="text-xs font-display font-bold text-[#111116]/70 uppercase tracking-wide">Engagement Rate</span>
+            <div className="w-8 h-8 rounded-full bg-[#6CEBB0] border-2 border-[#111116] text-[#111116] flex items-center justify-center shadow-[1px_1px_0px_#111116]">
+              <Zap size={15} />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
+            <div className="text-3xl font-display font-black text-[#111116]">
               {stats.avg_engagement_rate || 5.2}%
             </div>
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-emerald-600 font-medium">
+            <div className="flex items-center gap-1 mt-1 text-[11px] text-[#2e7d32] font-display font-bold">
               <Award size={12} />
-              <span>High benchmark (&gt;3.5%)</span>
+              <span>Above industry avg</span>
             </div>
           </div>
         </div>
 
         {/* Broadcasts Count */}
-        <div className="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between group hover:border-primary-200 transition-all">
+        <div className="bg-white border-2 border-[#111116] p-5 rounded-[24px] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Broadcast Pipeline</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Layers size={16} />
+            <span className="text-xs font-display font-bold text-[#111116]/70 uppercase tracking-wide">Pipeline</span>
+            <div className="w-8 h-8 rounded-full bg-[#ffe400] border-2 border-[#111116] text-[#111116] flex items-center justify-center shadow-[1px_1px_0px_#111116]">
+              <Layers size={15} />
             </div>
           </div>
           <div className="mt-4">
-            <div className="text-2xl sm:text-3xl font-display font-bold text-slate-900">
+            <div className="text-3xl font-display font-black text-[#111116]">
               {stats.published_count || 0}
             </div>
-            <div className="flex items-center gap-1.5 mt-1 text-[11px] text-slate-500 font-medium">
-              <span>{stats.scheduled_count || 0} scheduled · {stats.draft_count || 0} drafts</span>
+            <div className="text-[11px] text-[#111116]/70 font-medium mt-1">
+              {stats.scheduled_count || 0} scheduled · {stats.draft_count || 0} drafts
             </div>
           </div>
         </div>
@@ -228,54 +227,56 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
       {/* Platform Cards Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-display font-bold text-slate-900">Channel Performance Breakdown</h2>
-          <span className="text-xs font-medium text-slate-500">3 Connected Networks</span>
+          <h2 className="text-xl font-display font-black text-[#111116]">Channel Distribution Cards</h2>
+          <span className="neo-pill bg-[#ffe400] text-[#111116]">3 Networks Live</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* X (Twitter) Card */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-black text-white flex items-center justify-center shadow-sm">
-                  <XIcon className="w-4 h-4" />
+          <div className="bg-white border-2 border-[#111116] rounded-[26px] p-5 shadow-[5px_5px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-3.5 border-b-2 border-[#111116]/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-[#111116] text-white flex items-center justify-center border-2 border-[#111116] shadow-[2px_2px_0px_#111116]">
+                    <XIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-sm text-[#111116] leading-tight">X (Twitter)</h3>
+                    <p className="text-xs text-[#111116]/60 font-mono font-bold">{xStat.handle_or_name}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-slate-900 leading-tight">X (Twitter)</h3>
-                  <p className="text-xs text-slate-400 font-medium">{xStat.handle_or_name}</p>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <CheckCircle2 size={10} /> Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 my-4">
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Posts</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{xStat.total_posts}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Likes</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{xStat.total_likes}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Replies</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{xStat.total_comments}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Reach</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{xStat.estimated_reach}</span>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 size={10} /> Active
-              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 my-5">
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Total Posts</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{xStat.total_posts}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Total Likes</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{xStat.total_likes}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Replies</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{xStat.total_comments}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Est. Impressions</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{xStat.estimated_reach}</span>
-              </div>
-            </div>
-
-            <div className="text-[11px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
-              <span>Viral velocity: <strong className="text-slate-800">High</strong></span>
+            <div className="text-xs text-[#111116]/70 flex items-center justify-between pt-2 border-t-2 border-[#111116]/10 font-bold">
+              <span>Velocity: <strong>High</strong></span>
               <a
                 href={`https://x.com/${xStat.handle_or_name.replace('@', '')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-1"
+                className="text-[#6a6afe] hover:underline flex items-center gap-0.5"
               >
                 Profile <ArrowUpRight size={11} />
               </a>
@@ -283,48 +284,50 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
           </div>
 
           {/* LinkedIn Card */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#0a66c2] text-white flex items-center justify-center shadow-sm">
-                  <LinkedInIcon className="w-4 h-4" />
+          <div className="bg-white border-2 border-[#111116] rounded-[26px] p-5 shadow-[5px_5px_0px_#6a6afe] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-3.5 border-b-2 border-[#111116]/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-[#0a66c2] text-white flex items-center justify-center border-2 border-[#111116] shadow-[2px_2px_0px_#111116]">
+                    <LinkedInIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-sm text-[#111116] leading-tight">LinkedIn</h3>
+                    <p className="text-xs text-[#111116]/60 font-bold">{liStat.handle_or_name}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-slate-900 leading-tight">LinkedIn</h3>
-                  <p className="text-xs text-slate-400 font-medium">{liStat.handle_or_name}</p>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <CheckCircle2 size={10} /> Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 my-4">
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Posts</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{liStat.total_posts}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Reactions</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{liStat.total_likes}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Comments</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{liStat.total_comments}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Reach</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{liStat.estimated_reach}</span>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 size={10} /> Active
-              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 my-5">
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Total Posts</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{liStat.total_posts}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Reactions</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{liStat.total_likes}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Comments</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{liStat.total_comments}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Est. Impressions</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{liStat.estimated_reach}</span>
-              </div>
-            </div>
-
-            <div className="text-[11px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
-              <span>B2B Network authority: <strong className="text-slate-800">Growing</strong></span>
+            <div className="text-xs text-[#111116]/70 flex items-center justify-between pt-2 border-t-2 border-[#111116]/10 font-bold">
+              <span>Authority: <strong>Growing</strong></span>
               <a
                 href="https://www.linkedin.com/feed/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-1"
+                className="text-[#6a6afe] hover:underline flex items-center gap-0.5"
               >
                 Profile <ArrowUpRight size={11} />
               </a>
@@ -332,48 +335,50 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
           </div>
 
           {/* Instagram Card */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 text-white flex items-center justify-center shadow-sm">
-                  <InstagramIcon className="w-4 h-4" />
+          <div className="bg-white border-2 border-[#111116] rounded-[26px] p-5 shadow-[5px_5px_0px_#ff6a91] hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-3.5 border-b-2 border-[#111116]/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center border-2 border-[#111116] shadow-[2px_2px_0px_#111116]">
+                    <InstagramIcon className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-display font-black text-sm text-[#111116] leading-tight">Instagram</h3>
+                    <p className="text-xs text-[#111116]/60 font-mono font-bold">{igStat.handle_or_name}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-sm text-slate-900 leading-tight">Instagram</h3>
-                  <p className="text-xs text-slate-400 font-medium">{igStat.handle_or_name}</p>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <CheckCircle2 size={10} /> Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 my-4">
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Media Posts</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{igStat.total_posts}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Likes</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{igStat.total_likes}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Comments</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{igStat.total_comments}</span>
+                </div>
+                <div className="bg-[#fef7e6] border border-[#111116] p-2.5 rounded-xl shadow-[1px_1px_0px_#111116]">
+                  <span className="text-[10px] text-[#111116]/60 font-bold uppercase block">Reach</span>
+                  <span className="text-base font-display font-black text-[#111116] mt-0.5 block">{igStat.estimated_reach}</span>
                 </div>
               </div>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 size={10} /> Active
-              </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 my-5">
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Media Posts</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{igStat.total_posts}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Total Likes</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{igStat.total_likes}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Comments</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{igStat.total_comments}</span>
-              </div>
-              <div className="bg-slate-50/70 p-3 rounded-2xl">
-                <span className="text-[11px] text-slate-400 font-medium block">Est. Impressions</span>
-                <span className="text-lg font-bold text-slate-900 mt-0.5 block">{igStat.estimated_reach}</span>
-              </div>
-            </div>
-
-            <div className="text-[11px] text-slate-500 flex items-center justify-between pt-2 border-t border-slate-100">
-              <span>Account Type: <strong className="text-slate-800">Business</strong></span>
+            <div className="text-xs text-[#111116]/70 flex items-center justify-between pt-2 border-t-2 border-[#111116]/10 font-bold">
+              <span>Account: <strong>Business</strong></span>
               <a
                 href={`https://www.instagram.com/${igStat.handle_or_name.replace('@', '')}/`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-primary-600 hover:text-primary-700 font-semibold flex items-center gap-1"
+                className="text-[#ff6a91] hover:underline flex items-center gap-0.5"
               >
                 Profile <ArrowUpRight size={11} />
               </a>
@@ -384,146 +389,149 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
 
       {/* Activity Chart & Strategy Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weekly Activity Bar Visualization */}
-        <div className="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between mb-6">
+        {/* Weekly Activity Bar Visualization (Doooing Playful Chart) */}
+        <div className="lg:col-span-2 bg-white border-2 border-[#111116] rounded-[28px] p-6 shadow-[6px_6px_0px_#111116]">
+          <div className="flex items-center justify-between mb-6 pb-2 border-b-2 border-[#111116]/10">
             <div>
-              <h3 className="font-display font-bold text-base text-slate-900">Weekly Engagement Velocity</h3>
-              <p className="text-xs text-slate-400 mt-0.5">Interaction volume by day of the week</p>
+              <h3 className="font-display font-black text-base text-[#111116]">Weekly Engagement Velocity</h3>
+              <p className="text-xs text-[#111116]/60 font-medium">Community interaction volume across weekdays</p>
             </div>
-            <span className="text-xs font-semibold px-3 py-1 bg-slate-100 text-slate-600 rounded-full">
+            <span className="neo-pill bg-[#ffe400] text-[#111116] text-[10px]">
               7-Day Cadence
             </span>
           </div>
 
-          {/* Bar Visualization */}
+          {/* Bar Visualization with Doooing Colors & Hard Shadows */}
           <div className="h-48 flex items-end justify-between gap-3 pt-6 px-2">
             {weeklyActivity.map((day, idx) => {
               const maxEng = Math.max(...weeklyActivity.map(d => d.engagement), 1);
-              const heightPercent = Math.max(15, Math.round((day.engagement / maxEng) * 100));
+              const heightPercent = Math.max(18, Math.round((day.engagement / maxEng) * 100));
               const isPeak = heightPercent > 80;
 
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
-                  <span className="text-[10px] font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] font-mono font-bold text-[#111116] opacity-0 group-hover:opacity-100 transition-opacity">
                     {day.engagement}
                   </span>
-                  <div className="w-full bg-slate-100 rounded-xl overflow-hidden flex flex-col justify-end h-32 p-0.5">
+                  <div className="w-full bg-[#fef7e6] border-2 border-[#111116] rounded-xl overflow-hidden flex flex-col justify-end h-32 p-0.5 shadow-[2px_2px_0px_#111116]">
                     <div
                       style={{ height: `${heightPercent}%` }}
-                      className={`w-full rounded-lg transition-all duration-500 ${
+                      className={`w-full rounded-lg transition-all duration-500 border border-[#111116] ${
                         isPeak
-                          ? 'bg-gradient-to-t from-primary-600 to-indigo-500 shadow-sm'
-                          : 'bg-slate-300 group-hover:bg-primary-400'
+                          ? 'bg-[#ffe400]'
+                          : idx % 2 === 0 ? 'bg-[#6a6afe]' : 'bg-[#ff6a91]'
                       }`}
                     />
                   </div>
-                  <span className="text-xs font-medium text-slate-500">{day.day}</span>
+                  <span className="text-xs font-display font-bold text-[#111116]">{day.day}</span>
                 </div>
               );
             })}
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 pt-4 mt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-xs text-[#111116]/80 pt-4 mt-2 border-t-2 border-[#111116]/10 font-bold">
             <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-md bg-primary-600" /> Peak Days: Thursday & Friday
+              <span className="w-2.5 h-2.5 rounded-full bg-[#ffe400] border border-[#111116]" /> Peak Days: Thursday & Friday
             </span>
-            <span>Recommended publishing cadence: <strong>4-5x / week</strong></span>
+            <span>Recommended cadence: <strong>4-5 posts/wk</strong></span>
           </div>
         </div>
 
-        {/* AI Strategic Recommendations Card */}
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-6 shadow-md flex flex-col justify-between">
+        {/* AI Strategic Recommendations Card (Doooing Inverted Box) */}
+        <div className="bg-[#111116] text-white border-2 border-[#111116] rounded-[28px] p-6 shadow-[6px_6px_0px_#6a6afe] flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-lg bg-primary-500/20 text-primary-300 flex items-center justify-center border border-primary-500/30">
-                <Sparkles size={14} />
+              <div className="w-8 h-8 rounded-full bg-[#ffe400] border-2 border-white text-[#111116] flex items-center justify-center font-black">
+                <Sparkles size={16} />
               </div>
-              <span className="text-xs font-semibold text-primary-300 uppercase tracking-wider">AI Growth Audit</span>
+              <span className="text-xs font-display font-black text-[#ffe400] uppercase tracking-wider">AI Growth Audit</span>
             </div>
-            <h3 className="text-lg font-display font-bold text-white tracking-tight">Optimal Strategy</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-              Based on your connected platforms, here are the top 3 high-leverage tactics to boost performance this week:
+            <h3 className="text-xl font-display font-black text-white tracking-tight">Optimal Strategy</h3>
+            <p className="text-xs text-white/80 mt-2 leading-relaxed font-medium">
+              3 high-leverage growth actions to execute this week:
             </p>
 
-            <div className="mt-4 space-y-3">
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-xs">
-                <strong className="text-primary-300 block mb-0.5">1. Multi-Photo on Instagram:</strong>
+            <div className="mt-4 space-y-2.5">
+              <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-xs">
+                <strong className="text-[#ffe400] block mb-0.5">1. Multi-Photo on Instagram:</strong>
                 Carousels generate 2.4x more saves than single images. Use 3-5 slides for storytelling.
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-xs">
-                <strong className="text-primary-300 block mb-0.5">2. First 60-Minute Replies:</strong>
+              <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-xs">
+                <strong className="text-[#6CEBB0] block mb-0.5">2. First 60-Minute Replies:</strong>
                 Responding to comments instantly doubles your LinkedIn reach via algorithm reciprocity.
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-xs">
-                <strong className="text-primary-300 block mb-0.5">3. Optimal X Timing:</strong>
+              <div className="p-3 rounded-2xl bg-white/10 border border-white/20 text-xs">
+                <strong className="text-[#ff6a91] block mb-0.5">3. Optimal X Timing:</strong>
                 Post between 8:00 AM - 10:30 AM IST for maximum early retweet velocity.
               </div>
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-            <span>Powered by Gemini AI</span>
-            <span className="text-emerald-400 font-semibold flex items-center gap-1">
-              <CheckCircle2 size={12} /> Real-time tuned
+          <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-white/70 font-mono">
+            <span>Gemini AI Engine</span>
+            <span className="text-[#6CEBB0] font-bold flex items-center gap-1">
+              <CheckCircle2 size={12} /> Live Sync
             </span>
           </div>
         </div>
       </div>
 
-      {/* Top Performing Broadcasts Table / Feed */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs">
-        <div className="flex items-center justify-between mb-6">
+      {/* Top Performing Broadcasts Table (Doooing Style) */}
+      <div className="bg-white border-2 border-[#111116] rounded-[28px] p-6 sm:p-8 shadow-[6px_6px_0px_#111116]">
+        <div className="flex items-center justify-between mb-6 pb-2 border-b-2 border-[#111116]/10">
           <div>
-            <h3 className="font-display font-bold text-lg text-slate-900">Top Performing Campaigns</h3>
-            <p className="text-xs text-slate-400 mt-0.5">Ranked by likes, replies, and community interactions</p>
+            <h3 className="font-display font-black text-xl text-[#111116]">Top Performing Campaigns</h3>
+            <p className="text-xs text-[#111116]/60 font-medium">Ranked by likes, replies, and community interactions</p>
           </div>
         </div>
 
         {topPosts.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 text-xs">
+          <div className="text-center py-12 text-[#111116]/50 text-xs font-bold">
             No published campaigns yet. Create and dispatch your first broadcast to see ranking metrics!
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="space-y-3">
             {topPosts.map((post, idx) => (
-              <div key={post.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group">
+              <div
+                key={post.id}
+                className="p-4 rounded-2xl bg-[#fdfaf3] border-2 border-[#111116] shadow-[3px_3px_0px_#111116] flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+              >
                 <div className="flex items-start gap-3.5">
-                  <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
+                  <span className="w-7 h-7 rounded-full bg-[#ffe400] border-2 border-[#111116] text-[#111116] font-display font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#111116]">
+                    #{idx + 1}
                   </span>
                   <div>
-                    <h4 className="font-semibold text-sm text-slate-900 group-hover:text-primary-600 transition-colors">
+                    <h4 className="font-display font-black text-sm text-[#111116] group-hover:text-[#6a6afe] transition-colors">
                       {post.title}
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1 max-w-lg">
+                    <p className="text-xs text-[#111116]/75 mt-0.5 line-clamp-1 max-w-lg font-medium">
                       {post.content}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
                       {post.platforms.map((p, pIdx) => (
-                        <span key={pIdx} className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
+                        <span key={pIdx} className="text-[10px] font-display font-bold uppercase px-2 py-0.5 rounded-full bg-white border border-[#111116] text-[#111116] shadow-[1px_1px_0px_#111116]">
                           {p}
                         </span>
                       ))}
-                      <span className="text-[11px] text-slate-400">
+                      <span className="text-[11px] font-mono text-[#111116]/60 font-bold">
                         {post.created_at ? new Date(post.created_at).toLocaleDateString() : ''}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6 sm:self-center shrink-0">
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <Heart size={14} className="text-rose-500 fill-rose-500" />
-                    <span className="font-semibold">{post.likes}</span>
-                    <span className="text-[11px] text-slate-400">likes</span>
+                <div className="flex items-center gap-5 sm:self-center shrink-0">
+                  <div className="flex items-center gap-1.5 text-xs text-[#111116] font-bold">
+                    <Heart size={14} className="text-[#ff6a91] fill-[#ff6a91]" />
+                    <span>{post.likes}</span>
+                    <span className="text-[10px] text-[#111116]/60">likes</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-600">
-                    <MessageSquare size={14} className="text-primary-500" />
-                    <span className="font-semibold">{post.comments}</span>
-                    <span className="text-[11px] text-slate-400">replies</span>
+                  <div className="flex items-center gap-1.5 text-xs text-[#111116] font-bold">
+                    <MessageSquare size={14} className="text-[#6a6afe]" />
+                    <span>{post.comments}</span>
+                    <span className="text-[10px] text-[#111116]/60">replies</span>
                   </div>
-                  <span className="inline-flex px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="neo-pill bg-[#6CEBB0] text-[#111116] text-[10px]">
                     Published
                   </span>
                 </div>

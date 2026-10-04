@@ -12,8 +12,7 @@ import {
   Hash,
   HelpCircle,
   RotateCcw,
-  Minimize2,
-  ChevronUp
+  Minimize2
 } from 'lucide-react';
 import { askMediaAdvisor } from '../api/client';
 
@@ -30,7 +29,7 @@ export default function MediaAdvisorBot() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: "Hey Pankaj! 👋 I'm your **AI Social Media Advisor**.\n\nAsk me anything about **crafting viral hooks**, **high-converting captions**, **boosting engagement**, or **algorithm tricks** across X, LinkedIn, and Instagram!",
+      text: "Hey Pankaj! 👋 I'm your **Social Media Advisor**.\n\nAsk me anything about **crafting viral hooks**, **high-converting captions**, **boosting engagement**, or **algorithm tricks** across X, LinkedIn, and Instagram!",
       followups: [
         "Viral hook formulas for LinkedIn",
         "Best caption structure for Instagram",
@@ -71,7 +70,7 @@ export default function MediaAdvisorBot() {
         ...prev,
         {
           sender: 'bot',
-          text: res.reply || "I analyzed your question. Focus on stopping the scroll with high-curiosity opening lines and prompt responses in the first 60 minutes!",
+          text: res.reply || "Focus on stopping the scroll with high-curiosity opening lines and prompt responses in the first 60 minutes!",
           followups: res.suggested_followups || []
         }
       ]);
@@ -125,7 +124,7 @@ export default function MediaAdvisorBot() {
       if (trimmed.startsWith('### ') || trimmed.startsWith('## ')) {
         const headerText = trimmed.replace(/^#{2,3}\s+/, '');
         return (
-          <h4 key={idx} className="font-semibold text-slate-900 text-sm mt-2 mb-1 flex items-center gap-1.5">
+          <h4 key={idx} className="font-display font-black text-[#111116] text-xs mt-2.5 mb-1 flex items-center gap-1.5">
             {headerText}
           </h4>
         );
@@ -135,8 +134,8 @@ export default function MediaAdvisorBot() {
       if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
         const bulletText = trimmed.substring(2);
         return (
-          <div key={idx} className="flex items-start gap-2 my-1 text-xs text-slate-700 leading-relaxed">
-            <span className="text-primary-600 font-bold leading-none mt-1">•</span>
+          <div key={idx} className="flex items-start gap-2 my-1 text-xs text-[#111116]/90 leading-relaxed font-sans">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff6a91] shrink-0 mt-1.5 border border-[#111116]" />
             <span>{renderFormattedInline(bulletText)}</span>
           </div>
         );
@@ -147,15 +146,15 @@ export default function MediaAdvisorBot() {
         const num = trimmed.match(/^\d+\./)[0];
         const numText = trimmed.replace(/^\d+\.\s+/, '');
         return (
-          <div key={idx} className="flex items-start gap-2 my-1 text-xs text-slate-700 leading-relaxed">
-            <span className="font-semibold text-primary-600 text-[11px] min-w-[18px]">{num}</span>
+          <div key={idx} className="flex items-start gap-2 my-1 text-xs text-[#111116]/90 leading-relaxed font-sans">
+            <span className="font-mono font-bold text-[#6a6afe] text-[11px] min-w-[18px]">{num}</span>
             <span>{renderFormattedInline(numText)}</span>
           </div>
         );
       }
 
       return (
-        <p key={idx} className="text-xs text-slate-700 leading-relaxed my-1">
+        <p key={idx} className="text-xs text-[#111116]/90 leading-relaxed my-1 font-sans">
           {renderFormattedInline(trimmed)}
         </p>
       );
@@ -163,12 +162,8 @@ export default function MediaAdvisorBot() {
   };
 
   const renderFormattedInline = (str) => {
-    // Basic bold and italic replacement
     const parts = [];
-    let remaining = str;
     let keyIdx = 0;
-
-    // Split on **bold**
     const boldRegex = /\*\*(.*?)\*\*/g;
     let match;
     let lastIndex = 0;
@@ -178,7 +173,7 @@ export default function MediaAdvisorBot() {
         parts.push(str.substring(lastIndex, match.index));
       }
       parts.push(
-        <strong key={`b-${keyIdx++}`} className="font-semibold text-slate-900">
+        <strong key={`b-${keyIdx++}`} className="font-bold text-[#111116]">
           {match[1]}
         </strong>
       );
@@ -195,64 +190,62 @@ export default function MediaAdvisorBot() {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Bot Chat Window */}
       {isOpen && (
-        <div className="w-[380px] sm:w-[420px] h-[560px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden mb-3 animate-fade-in transition-all backdrop-blur-xl">
+        <div className="w-[380px] sm:w-[420px] h-[580px] max-h-[85vh] bg-[#fef7e6] rounded-[28px] border-2 border-[#111116] shadow-[8px_8px_0px_#111116] flex flex-col overflow-hidden mb-3 animate-fade-in transition-all text-[#111116]">
+          
           {/* Header */}
-          <div className="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+          <div className="px-5 py-3.5 bg-[#6a6afe] text-white border-b-2 border-[#111116] flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary-500 to-indigo-500 flex items-center justify-center text-white shadow-md">
-                  <Bot size={17} />
-                </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900 animate-pulse" />
+              <div className="w-9 h-9 rounded-full bg-[#ffe400] border-2 border-[#111116] text-[#111116] flex items-center justify-center font-black shadow-[2px_2px_0px_#111116]">
+                <Bot size={18} />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-sm leading-none text-white tracking-tight">Social Advisor</h3>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-primary-500/20 text-primary-300 border border-primary-500/30">
+                  <h3 className="font-display font-black text-sm leading-tight text-white tracking-tight">Social Advisor</h3>
+                  <span className="text-[10px] font-display font-black px-2 py-0.5 rounded-full bg-[#ffe400] text-[#111116] border border-[#111116] shadow-[1px_1px_0px_#111116]">
                     Gemini AI
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-0.5">Captions, Hooks & Algorithm Strategy</p>
+                <p className="text-[11px] text-white/80 font-medium">Captions, Hooks & Algorithm Growth</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={clearChat}
                 title="Reset conversation"
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                className="w-7 h-7 rounded-full bg-white border-2 border-[#111116] text-[#111116] hover:bg-[#ffe400] shadow-[2px_2px_0px_#111116] flex items-center justify-center transition-all cursor-pointer"
               >
-                <RotateCcw size={14} />
+                <RotateCcw size={12} />
               </button>
               <button
                 onClick={() => setIsOpen(false)}
                 title="Minimize advisor"
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                className="w-7 h-7 rounded-full bg-white border-2 border-[#111116] text-[#111116] hover:bg-[#ffebee] shadow-[2px_2px_0px_#111116] flex items-center justify-center transition-all cursor-pointer"
               >
-                <Minimize2 size={14} />
+                <Minimize2 size={12} />
               </button>
             </div>
           </div>
 
           {/* Messages list */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/60 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#fef7e6] custom-scrollbar">
             {messages.map((m, idx) => (
               <div
                 key={idx}
                 className={`flex gap-2.5 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {m.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs shadow-sm">
-                    <Sparkles size={13} className="text-primary-400" />
+                  <div className="w-7 h-7 rounded-full bg-[#ffe400] border-2 border-[#111116] text-[#111116] flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#111116]">
+                    <Sparkles size={12} className="text-[#111116]" />
                   </div>
                 )}
 
                 <div className="max-w-[85%]">
                   <div
-                    className={`p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
+                    className={`p-3.5 rounded-2xl text-xs leading-relaxed border-2 border-[#111116] ${
                       m.sender === 'user'
-                        ? 'bg-primary-600 text-white rounded-tr-none font-medium'
-                        : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-none'
+                        ? 'bg-[#ff6a91] text-white rounded-tr-none font-medium shadow-[3px_3px_0px_#111116]'
+                        : 'bg-white text-[#111116] rounded-tl-none shadow-[3px_3px_0px_#111116]'
                     }`}
                   >
                     {m.sender === 'user' ? (
@@ -269,10 +262,10 @@ export default function MediaAdvisorBot() {
                         <button
                           key={chipIdx}
                           onClick={() => handleSend(chip)}
-                          className="text-[11px] bg-white hover:bg-primary-50 text-slate-700 hover:text-primary-700 border border-slate-200 hover:border-primary-200 px-2.5 py-1 rounded-full transition-all text-left flex items-center gap-1 shadow-2xs hover:shadow-xs active:scale-95"
+                          className="text-[11px] font-display font-bold bg-white hover:bg-[#ffe400] text-[#111116] border-2 border-[#111116] px-3 py-1 rounded-full transition-all text-left flex items-center gap-1 shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_#111116] cursor-pointer"
                         >
                           <span>{chip}</span>
-                          <ArrowRight size={10} className="text-slate-400 shrink-0" />
+                          <ArrowRight size={10} className="text-[#111116] shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -280,8 +273,8 @@ export default function MediaAdvisorBot() {
                 </div>
 
                 {m.sender === 'user' && (
-                  <div className="w-7 h-7 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center shrink-0 mt-0.5 text-xs font-semibold">
-                    <User size={13} />
+                  <div className="w-7 h-7 rounded-full bg-[#6CEBB0] border-2 border-[#111116] text-[#111116] flex items-center justify-center shrink-0 mt-0.5 text-xs font-black shadow-[1px_1px_0px_#111116]">
+                    <User size={12} />
                   </div>
                 )}
               </div>
@@ -290,14 +283,14 @@ export default function MediaAdvisorBot() {
             {/* Loading animation */}
             {isLoading && (
               <div className="flex gap-2.5 justify-start">
-                <div className="w-7 h-7 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0 mt-0.5">
-                  <Sparkles size={13} className="text-primary-400 animate-spin" />
+                <div className="w-7 h-7 rounded-full bg-[#ffe400] border-2 border-[#111116] text-[#111116] flex items-center justify-center shrink-0 mt-0.5 shadow-[1px_1px_0px_#111116]">
+                  <Sparkles size={12} className="animate-spin text-[#111116]" />
                 </div>
-                <div className="bg-white border border-slate-200/80 rounded-2xl rounded-tl-none p-3.5 shadow-sm flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-primary-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-primary-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 rounded-full bg-primary-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  <span className="text-[11px] text-slate-500 font-medium ml-2">Advisor analyzing strategies...</span>
+                <div className="bg-white border-2 border-[#111116] rounded-2xl rounded-tl-none p-3 shadow-[3px_3px_0px_#111116] flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#ff6a91] animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-2 h-2 rounded-full bg-[#6a6afe] animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-2 h-2 rounded-full bg-[#ffe400] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="text-[11px] font-display font-bold text-[#111116] ml-1">Analyzing viral patterns...</span>
                 </div>
               </div>
             )}
@@ -307,9 +300,9 @@ export default function MediaAdvisorBot() {
 
           {/* Quick starter chips if first message */}
           {messages.length === 1 && (
-            <div className="px-4 py-2 bg-white border-t border-slate-100">
-              <div className="text-[11px] font-semibold text-slate-500 mb-1.5 flex items-center gap-1">
-                <HelpCircle size={12} /> Popular Growth Topics:
+            <div className="px-4 py-2 bg-white border-t-2 border-[#111116]">
+              <div className="text-[11px] font-display font-bold text-[#111116] mb-1.5 flex items-center gap-1">
+                <HelpCircle size={12} className="text-[#ff6a91]" /> Popular Growth Questions:
               </div>
               <div className="flex flex-wrap gap-1">
                 {SUGGESTED_QUERIES.map((q, qIdx) => {
@@ -318,9 +311,9 @@ export default function MediaAdvisorBot() {
                     <button
                       key={qIdx}
                       onClick={() => handleSend(q.text)}
-                      className="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded-md transition-all flex items-center gap-1"
+                      className="text-[10px] font-display font-bold bg-[#fdfaf3] hover:bg-[#ffe400] text-[#111116] px-2.5 py-1 rounded-full border border-[#111116] shadow-[1px_1px_0px_#111116] transition-all flex items-center gap-1 cursor-pointer"
                     >
-                      <Icon size={11} className="text-primary-600" />
+                      <Icon size={10} className="text-[#6a6afe]" />
                       <span>{q.text}</span>
                     </button>
                   );
@@ -330,8 +323,8 @@ export default function MediaAdvisorBot() {
           )}
 
           {/* Input Area */}
-          <div className="p-3 bg-white border-t border-slate-200">
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-2xl px-3 py-1.5 focus-within:ring-2 focus-within:ring-primary-500/20 focus-within:border-primary-500 transition-all">
+          <div className="p-3 bg-white border-t-2 border-[#111116]">
+            <div className="flex items-center gap-2 bg-[#fdfaf3] border-2 border-[#111116] rounded-2xl px-3 py-1 focus-within:border-[#6a6afe] shadow-[2px_2px_0px_#111116] transition-all">
               <textarea
                 ref={inputRef}
                 value={inputText}
@@ -339,43 +332,40 @@ export default function MediaAdvisorBot() {
                 onKeyDown={handleKeyDown}
                 rows={1}
                 placeholder="Ask about hooks, captions, engagement..."
-                className="flex-1 bg-transparent border-0 focus:ring-0 text-xs text-slate-900 placeholder:text-slate-400 resize-none py-1.5 max-h-24 custom-scrollbar"
+                className="flex-1 bg-transparent border-0 focus:ring-0 text-xs text-[#111116] placeholder:text-[#111116]/40 resize-none py-1.5 max-h-24 custom-scrollbar font-medium"
               />
               <button
                 onClick={() => handleSend()}
                 disabled={!inputText.trim() || isLoading}
-                className="w-8 h-8 rounded-xl bg-primary-600 hover:bg-primary-700 disabled:bg-slate-200 text-white disabled:text-slate-400 flex items-center justify-center shrink-0 transition-all shadow-sm active:scale-95"
+                className="w-8 h-8 rounded-xl bg-[#ffe400] hover:bg-[#ffed4a] disabled:bg-slate-200 text-[#111116] disabled:text-slate-400 border-2 border-[#111116] shadow-[2px_2px_0px_#111116] flex items-center justify-center shrink-0 transition-all hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none cursor-pointer"
               >
                 <Send size={13} />
               </button>
             </div>
-            <p className="text-[10px] text-center text-slate-400 mt-1.5">
+            <p className="text-[10px] font-medium text-center text-[#111116]/60 mt-1.5">
               Powered by Google Gemini · Tailored for X, LinkedIn & Instagram
             </p>
           </div>
         </div>
       )}
 
-      {/* Floating Trigger Pill */}
+      {/* Floating Trigger Pill (Doooing Playful Style) */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-2.5 bg-slate-900 hover:bg-slate-800 text-white pl-3.5 pr-4 py-3 rounded-full shadow-xl hover:shadow-2xl border border-slate-700 transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
-          title="Open Social Media Advisor"
+          className="group relative flex items-center gap-3 bg-[#ffe400] hover:bg-[#ffed4a] text-[#111116] pl-3.5 pr-4 py-2.5 rounded-full border-2 border-[#111116] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
+          title="Open AI Social Media Advisor"
         >
-          {/* Subtle glowing animated ring */}
-          <span className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary-500 to-indigo-500 opacity-30 group-hover:opacity-75 blur-sm transition duration-300 animate-pulse" />
-
-          <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-tr from-primary-500 to-indigo-500 text-white shadow-xs">
-            <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
+          <div className="w-8 h-8 rounded-full bg-[#ff6a91] border-2 border-[#111116] text-white flex items-center justify-center shadow-[1px_1px_0px_#111116] group-hover:rotate-12 transition-transform">
+            <Sparkles size={16} />
           </div>
 
-          <div className="relative flex flex-col text-left">
-            <span className="text-xs font-semibold leading-tight tracking-tight flex items-center gap-1.5">
+          <div className="flex flex-col text-left">
+            <span className="text-xs font-display font-black leading-tight tracking-tight flex items-center gap-1.5">
               AI Advisor
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-[#6CEBB0] border border-[#111116] animate-ping" />
             </span>
-            <span className="text-[10px] text-slate-400 font-medium">Captions & Growth</span>
+            <span className="text-[10px] font-bold text-[#111116]/70 leading-none">Captions & Growth</span>
           </div>
         </button>
       )}
