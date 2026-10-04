@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     # Server settings
     BACKEND_HOST: str = "127.0.0.1"
-    BACKEND_PORT: int = 8000
+    BACKEND_PORT: int = 8080
     DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'automation.db'}"
 
     # Twitter / X API v2 Credentials

@@ -82,7 +82,7 @@ Engineered with a **FastAPI (Python)** backend, **SQLite + APScheduler** queue, 
 cd backend
 .\.venv\Scripts\python.exe run.py
 ```
-> The backend will start on **`http://127.0.0.1:8000`**. Interactive Swagger docs are available at **`http://127.0.0.1:8000/docs`**.
+> The backend will start on **`http://127.0.0.1:8080`**. Interactive Swagger docs are available at **`http://127.0.0.1:8080/docs`**.
 
 #### 2. Frontend (Terminal 2)
 ```powershell

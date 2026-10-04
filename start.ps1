@@ -7,7 +7,7 @@ Write-Host "=====================================================" -ForegroundCo
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 # 1. Start Backend in background process
-Write-Host "[1/2] Launching FastAPI Backend on http://127.0.0.1:8000..." -ForegroundColor Yellow
+Write-Host "[1/2] Launching FastAPI Backend on http://127.0.0.1:8080..." -ForegroundColor Yellow
 $BackendProcess = Start-Process -FilePath "$Root\backend\.venv\Scripts\python.exe" -ArgumentList "$Root\backend\run.py" -WorkingDirectory "$Root\backend" -PassThru
 
 # Wait briefly for backend to spin up
