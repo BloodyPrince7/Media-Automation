@@ -57,7 +57,18 @@ app.add_middleware(
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 
-# --- HEALTH CHECK ---
+# --- HEALTH & ROOT ENDPOINTS ---
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "service": "Social Pulse Studio API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/api/health"
+    }
+
+
 @app.get("/api/health")
 def health_check():
     return {
