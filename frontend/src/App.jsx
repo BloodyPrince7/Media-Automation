@@ -210,43 +210,9 @@ export default function App() {
         </h1>
 
         {/* Professional Subtitle */}
-        <p className="text-[#111116]/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-8 font-medium">
+        <p className="text-[#111116]/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
           Coordinate content across your publishing channels from a single workbench. Craft tailored variations, preview authentic feeds, schedule campaigns, and respond to audience threads in real time.
         </p>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-center gap-3.5 flex-wrap">
-          <button
-            onClick={() => {
-              setActiveView('studio');
-              window.scrollTo({ top: 480, behavior: 'smooth' });
-            }}
-            className="px-7 py-3 rounded-full bg-[#6a6afe] text-white border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-          >
-            Open Studio Composer
-          </button>
-
-          <button
-            onClick={() => setActiveView('queue')}
-            className="px-7 py-3 rounded-full bg-white text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-          >
-            Scheduled Queue ({scheduledCount})
-          </button>
-
-          <button
-            onClick={() => setActiveView('history')}
-            className="px-7 py-3 rounded-full bg-[#6CEBB0] text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-          >
-            Engagement Stream
-          </button>
-
-          <button
-            onClick={() => setActiveView('analytics')}
-            className="px-7 py-3 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-bold text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-          >
-            Performance Analytics
-          </button>
-        </div>
       </section>
 
       {/* ── ORGANIC WAVE SCOOP DIVIDER ── */}
@@ -485,30 +451,21 @@ export default function App() {
       </div>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-[#ff6a91] text-white pt-10 pb-12 px-6 sm:px-12 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto flex flex-col gap-10">
+      <footer className="bg-[#ff6a91] text-white pt-8 pb-10 px-6 sm:px-12 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto flex flex-col gap-6">
           
-          {/* Main CTA */}
-          <div className="text-center py-6">
-            <h2 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white mb-4">
+          {/* Main Footer Heading */}
+          <div className="text-center py-4">
+            <h2 className="text-2xl sm:text-4xl font-display font-black tracking-tight text-white mb-2">
               Scale your communication across every channel.
             </h2>
-            <p className="text-white/90 text-sm sm:text-base max-w-xl mx-auto mb-6 font-medium">
+            <p className="text-white/90 text-sm sm:text-base max-w-xl mx-auto font-medium">
               Centralized authoring, intelligent channel adaptation, and direct real-time thread interactions.
             </p>
-            <button
-              onClick={() => {
-                setActiveView('studio');
-                window.scrollTo({ top: 380, behavior: 'smooth' });
-              }}
-              className="px-8 py-3 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-black text-sm shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-            >
-              Compose Broadcast
-            </button>
           </div>
 
-          {/* Footer Navigation Columns */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t-2 border-white/20 text-xs font-display font-bold">
+          {/* Footer Info */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-white/20 text-xs font-display font-bold">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] flex items-center justify-center font-black">
                 P
@@ -516,23 +473,8 @@ export default function App() {
               <span className="text-base tracking-tight text-white">Social Pulse Studio</span>
             </div>
 
-            <div className="flex items-center gap-6 flex-wrap justify-center">
-              <button onClick={() => setActiveView('studio')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
-                Studio Composer
-              </button>
-              <button onClick={() => setActiveView('queue')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
-                Scheduled Queue
-              </button>
-              <button onClick={() => setActiveView('history')} className="hover:text-[#ffe400] transition-colors cursor-pointer">
-                Published Feed
-              </button>
-              <button onClick={() => setIsSettingsOpen(true)} className="hover:text-[#ffe400] transition-colors cursor-pointer">
-                Channel Gateways
-              </button>
-            </div>
-
             <div className="text-white/80 font-normal font-sans text-xs">
-              © 2026 Pulse Studio Enterprise
+              © 2026 Pulse Studio Enterprise • Multi-Channel Media Automation
             </div>
           </div>
         </div>
