@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Image as ImageIcon, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { resolveMediaUrl } from '../api/client';
 
 export default function InstagramPreview({ text = '', mediaUrls = [] }) {
@@ -104,6 +104,10 @@ export default function InstagramPreview({ text = '', mediaUrls = [] }) {
               1/{mediaUrls.length}
             </div>
           )}
+          <div className="absolute bottom-2.5 left-2.5 bg-[#111116]/85 backdrop-blur-sm text-[#6CEBB0] text-[10px] font-display font-bold px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1 shadow-sm">
+            <CheckCircle2 size={10} />
+            <span>Auto-Ratio 4:5 to 1.91:1</span>
+          </div>
         </div>
       ) : (
         <div className="aspect-square sm:aspect-[4/3] bg-[#fcf8ef] border-y border-dashed border-[#111116]/20 flex flex-col items-center justify-center p-6 text-center">
