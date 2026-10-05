@@ -1,23 +1,53 @@
 # ⚡ Social Pulse Studio
 
-A modern, high-craft social media post automation and multi-platform distribution tool tailored specifically for **X (Twitter)** and **LinkedIn**.
+> Next-Generation AI Social Media Automation, Intelligent Adaptation & Multi-Channel Distribution Engine.
 
-Engineered with a **FastAPI (Python)** backend, **SQLite + APScheduler** queue, and a **Vite + React** dashboard featuring live authentic feed simulators.
+[![Release](https://img.shields.io/badge/Release-v1.0.0-6a6afe.svg)](https://github.com/BloodyPrince7/Media-Automation/releases/tag/v1.0.0)
+[![Backend](https://img.shields.io/badge/Render-Live-059669.svg)](https://media-automation-backend.onrender.com/api/health)
+[![Frontend](https://img.shields.io/badge/Vercel-Deployed-ff6a91.svg)](https://media-automation-henna.vercel.app)
+[![Design](https://img.shields.io/badge/Theme-Doooing%20Neo--Brutalist-ffe400.svg)](https://doooing.be)
 
 ---
 
-## 🌟 Highlights & Architecture
+## 🌐 Live Deployments
 
-- **High-Craft Modern Interface**: Clean, deliberate, dark-mode SaaS UI inspired by Linear & Typefully (not a generic AI template).
-- **Authentic Feed Simulators**: Real-time rendering of your post as it will look on **X** and **LinkedIn** (including accurate verified badges, character counts, avatar framing, hashtag highlights, and action bars).
-- **Compose Once, Calibrate Per-Platform**: Write a master thought once, or expand into custom per-platform versions (e.g., keep X under 280 characters while adding formatted bullet points for LinkedIn).
-- **Reliable Automation & Queue**: Background scheduler running every 15 seconds to execute scheduled posts at exact timestamps.
-- **Simulation / Mock Mode**: Test the full publishing workflow, UI, scheduling, and database persistence out of the box without needing developer keys immediately.
-- **Live Publishing Gateway**:
-  - **X (Twitter)** via Tweepy (v2 API for tweets, v1.1 for media chunks).
-  - **LinkedIn** via modern REST Posts API (`POST /rest/posts`).
-- **Media Asset Support**: Drag-and-drop support for PNG, JPG, GIF, WebP, and MP4 videos.
-- **Audit & Delivery Receipts**: Track delivery status, timestamps, and open direct links to live published posts.
+- 🚀 **Web App (Frontend)**: [https://media-automation-henna.vercel.app](https://media-automation-henna.vercel.app)
+- ⚙️ **API Service (Backend)**: [https://media-automation-backend.onrender.com](https://media-automation-backend.onrender.com)
+- 📖 **Interactive API Docs (Swagger UI)**: [https://media-automation-backend.onrender.com/docs](https://media-automation-backend.onrender.com/docs)
+- 🩺 **Health Check**: [https://media-automation-backend.onrender.com/api/health](https://media-automation-backend.onrender.com/api/health)
+
+---
+
+## ✨ Features & Architecture
+
+### 1. 🎨 Neo-Brutalist Design System
+- Built on the bold **Doooing.be** aesthetic: canvas cream `#fef7e6`, bold 2.5px borders `#111116`, signature color blocks (`#ffe400`, `#ff6a91`, `#6a6afe`, `#6CEBB0`), and hard offset drop shadows (`shadow-[8px_8px_0px_#111116]`).
+- **Interactive Floating Stage**: Physics-inspired mouse-parallax badges, 3D rotating cubes, follower counters, and radar beacons.
+- **Custom Neo Cursors**: Neo-brutalist yellow hard-shadow arrow, pink pointing hand on interactive elements, and highlighter selection.
+
+### 2. 🔐 Full-Stack User Authentication
+- Gated entry with dedicated full-page [AuthScreen](file:///c:/Users/Pankaj/Desktop/Media%20Automation/frontend/src/components/AuthScreen.jsx).
+- Secure password hashing using **PBKDF2 HMAC SHA-256** with unique 16-byte random salts and 100,000 iterations.
+- Session tokens with real-time verification and logout management.
+
+### 3. 📱 Multi-Platform Distribution & Live Simulators
+- **X (Twitter)**: Tweepy v2 tweets & v1.1 chunked media uploads with 280-char counter and feed simulation.
+- **LinkedIn**: REST Posts API (`POST /rest/posts`) with formatted long-form text and reaction previews.
+- **Instagram**: Meta Graph API (Professional/Creator Account) with media aspect ratio enforcement and carousel counters.
+- **All Channels Mode**: Author once, preview side-by-side, and adapt per channel.
+
+### 4. 🤖 AI Copilot & Floating Media Advisor Bot
+- Integrated with **Google Gemini 2.5 Flash / Flash Lite** via the official `google-genai` SDK.
+- **One-Click Content Optimization**: Auto-adapts tone, length, hooks, and hashtags for each destination platform.
+- **Floating Media Advisor Bot**: Real-time advice on engagement strategies, caption writing, post timing, and content hooks.
+
+### 5. 📊 Audience Analytics & Performance Dashboard
+- Real-time aggregated statistics across all connected channels (Total Followers, Impressions, Engagement Rate, Likes, Reposts).
+- Per-platform metric cards, top-performing post breakdowns, and growth indicators.
+
+### 6. ⏰ Background Scheduling & Dispatch Engine
+- Powered by **APScheduler** running background cron intervals.
+- Non-blocking async queue with scheduled publication at exact timestamps.
 
 ---
 
@@ -27,80 +57,90 @@ Engineered with a **FastAPI (Python)** backend, **SQLite + APScheduler** queue, 
 .
 ├── backend/
 │   ├── app/
-│   │   ├── config.py              # Configuration & environment variables
+│   │   ├── config.py              # Environment configuration & credentials
 │   │   ├── database.py            # SQLite database engine & session maker
-│   │   ├── models.py              # SQLAlchemy models (Post, PublishLog, AppSetting)
-│   │   ├── schemas.py             # Pydantic request/response schemas
+│   │   ├── models.py              # SQLAlchemy models (User, Post, PublishLog, AppSetting)
+│   │   ├── schemas.py             # Pydantic schemas
+│   │   ├── auth.py                # PBKDF2 hashing & session token management
 │   │   ├── scheduler.py           # APScheduler background worker (every 15s)
-│   │   ├── ai_service.py          # Gemini AI / heuristic post adapter
-│   │   ├── publishers/
-│   │   │   ├── base.py            # Base publisher abstract interface
-│   │   │   ├── twitter_publisher.py  # X API v2 publisher
-│   │   │   ├── linkedin_publisher.py # LinkedIn REST API publisher
-│   │   │   └── mock_publisher.py     # High-fidelity simulation mode
-│   │   └── main.py                # FastAPI application & REST endpoints
-│   ├── uploads/                   # Uploaded media assets storage
-│   ├── requirements.txt           # Python dependencies
-│   └── run.py                     # ASGI runner script
+│   │   ├── ai_service.py          # Google Gemini AI integration
+│   │   ├── publishers/            # Multi-channel publishing adapters
+│   │   │   ├── base.py
+│   │   │   ├── twitter_publisher.py
+│   │   │   ├── linkedin_publisher.py
+│   │   │   ├── instagram_publisher.py
+│   │   │   └── mock_publisher.py
+│   │   └── main.py                # FastAPI endpoints & CORS middleware
+│   ├── uploads/                   # Uploaded media assets
+│   ├── requirements.txt           # Python backend dependencies
+│   └── run.py                     # Local development runner
 ├── frontend/
 │   ├── src/
-│   │   ├── api/client.js          # Axios API client wrapper
-│   │   ├── components/
-│   │   │   ├── Composer.jsx       # Studio composer with character counters
-│   │   │   ├── XPreview.jsx       # Authentic X / Twitter feed simulator
-│   │   │   ├── LinkedInPreview.jsx# Authentic LinkedIn feed simulator
-│   │   │   ├── MediaUploader.jsx  # Drag & drop media dropzone & thumbnails
-│   │   │   ├── ScheduledQueue.jsx # Queue and upcoming scheduled posts
-│   │   │   ├── PostHistory.jsx    # Delivery audit logs with live links
-│   │   │   └── SettingsModal.jsx  # API credentials & mock mode toggle
-│   │   ├── App.jsx                # Main workspace & layout
-│   │   └── index.css              # Tailwind CSS styles
-│   ├── package.json
-│   └── vite.config.js             # Vite config with backend proxy
-├── .env.example                   # Template environment variables
-├── .gitignore                     # Git ignore rules
-├── start.bat                      # 1-Click Windows launcher
-├── start.ps1                      # PowerShell launcher
+│   │   ├── api/client.js          # Axios API client with dynamic backend resolution
+│   │   ├── components/            # UI Components
+│   │   │   ├── AuthScreen.jsx     # Gated login & registration screen
+│   │   │   ├── Composer.jsx       # Studio post composer & platform switcher
+│   │   │   ├── XPreview.jsx       # Twitter live simulator
+│   │   │   ├── LinkedInPreview.jsx# LinkedIn live simulator
+│   │   │   ├── InstagramPreview.jsx # Instagram live simulator
+│   │   │   ├── ScheduledQueue.jsx # Queue manager
+│   │   │   ├── PostHistory.jsx    # Delivery logs with live links
+│   │   │   ├── AnalyticsDashboard.jsx # Statistics & audience metrics
+│   │   │   ├── MediaAdvisorBot.jsx # Floating AI Advisor
+│   │   │   └── FloatingObjectsStage.jsx # Parallax background stage
+│   │   ├── App.jsx                # Root application
+│   │   └── index.css              # Neo-brutalist Tailwind styling & cursors
+│   ├── vercel.json                # Vercel proxy rewrite configuration
+│   └── vite.config.js             # Vite bundler configuration
+├── render.yaml                    # Render Blueprint deployment definition
 └── README.md
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Local Development
 
-### Option 1: 1-Click Launchers
-
-- **Windows Batch**: Double-click [start.bat](file:///c:/Users/Pankaj/Desktop/Media%20Automation/start.bat).
-- **PowerShell**: Run `.\start.ps1` in your terminal.
-
----
-
-### Option 2: Manual Start
-
-#### 1. Backend (Terminal 1)
-```powershell
+### 1. Backend Setup
+```bash
 cd backend
-.\.venv\Scripts\python.exe run.py
-```
-> The backend will start on **`http://127.0.0.1:8080`**. Interactive Swagger docs are available at **`http://127.0.0.1:8080/docs`**.
+python -m venv .venv
+# On Windows:
+.\.venv\Scripts\activate
+# On Linux/macOS:
+# source .venv/bin/activate
 
-#### 2. Frontend (Terminal 2)
-```powershell
-cd frontend
-npm.cmd run dev
+pip install -r requirements.txt
+python run.py
 ```
-> The frontend will start on **`http://localhost:5173`**.
+> Backend runs at `http://127.0.0.1:8080`. API documentation at `http://127.0.0.1:8080/docs`.
+
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
+> Frontend runs at `http://localhost:5173`.
 
 ---
 
-## 🔑 Configuring Live API Credentials
+## ☁️ Deployment Guide
 
-You can test everything right away in **Simulation Mode** (enabled by default). When you are ready to publish to real accounts:
+### Render (Backend Web Service)
+1. Link your GitHub repository in [Render Dashboard](https://dashboard.render.com).
+2. Create a **Web Service**:
+   - **Root Directory**: `backend`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+3. Add Environment Variables: `GEMINI_API_KEY`, `PYTHON_VERSION=3.11.9`, and your platform tokens.
 
-1. Click **Credentials** in the top navigation bar of the app.
-2. Toggle **Simulation / Mock Mode** to **Live Production**.
-3. Supply your API keys:
-   - **X (Twitter)**: API Key, API Secret, Access Token, and Access Token Secret from the [X Developer Portal](https://developer.x.com/).
-   - **LinkedIn**: Access Token and Author URN (`urn:li:person:XXXX` or `urn:li:organization:XXXX`) from the [LinkedIn Developer Portal](https://www.linkedin.com/developers/).
-   - *(Optional)* **Google Gemini**: API Key from [Google AI Studio](https://aistudio.google.com/) for AI post synthesis.
-4. Click **Save Configuration**.
+### Vercel (Frontend Web App)
+1. Import repository in [Vercel Dashboard](https://vercel.com).
+2. **Root Directory**: `frontend`
+3. **Framework**: `Vite`
+4. Deploy — [frontend/vercel.json](file:///c:/Users/Pankaj/Desktop/Media%20Automation/frontend/vercel.json) automatically proxies `/api/*` requests to your Render service!
+
+---
+
+## 📄 License
+MIT License © 2026 Pulse Studio Enterprise
