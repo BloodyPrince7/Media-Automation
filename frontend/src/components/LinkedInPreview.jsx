@@ -50,7 +50,7 @@ export default function LinkedInPreview({ text = '', mediaUrls = [] }) {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-white text-[15px] hover:text-[#70b5f8] cursor-pointer">Pankaj</span>
+                <span className="font-semibold text-white text-[15px] hover:text-[#70b5f8] cursor-pointer">Creator</span>
                 <span className="text-xs text-neutral-400">• 1st</span>
               </div>
               <p className="text-xs text-neutral-400 line-clamp-1">Building Automation & Software Systems</p>

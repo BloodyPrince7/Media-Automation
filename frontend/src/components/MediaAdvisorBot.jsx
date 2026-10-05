@@ -29,7 +29,7 @@ export default function MediaAdvisorBot() {
   const [messages, setMessages] = useState([
     {
       sender: 'bot',
-      text: "Hey Pankaj! 👋 I'm your **Social Media Advisor**.\n\nAsk me anything about **crafting viral hooks**, **high-converting captions**, **boosting engagement**, or **algorithm tricks** across X, LinkedIn, and Instagram!",
+      text: "Hey there! 👋 I'm your **Social Media Advisor**.\n\nAsk me anything about **crafting viral hooks**, **high-converting captions**, **boosting engagement**, or **algorithm tricks** across X, LinkedIn, and Instagram!",
       followups: [
         "Viral hook formulas for LinkedIn",
         "Best caption structure for Instagram",

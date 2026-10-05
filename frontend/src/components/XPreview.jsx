@@ -60,9 +60,9 @@ export default function XPreview({ text = '', mediaUrls = [], charValidation = n
           {/* Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-[15px] hover:underline cursor-pointer">Pankaj</span>
+              <span className="font-bold text-[15px] hover:underline cursor-pointer">Creator</span>
               <CheckCircle2 className="w-4 h-4 fill-[#1d9bf0] text-black" />
-              <span className="text-neutral-500 text-[14px]">@pankaj_dev</span>
+              <span className="text-neutral-500 text-[14px]">@creator_studio</span>
               <span className="text-neutral-500 text-[14px]">·</span>
               <span className="text-neutral-500 text-[14px] hover:underline cursor-pointer">Just now</span>
             </div>

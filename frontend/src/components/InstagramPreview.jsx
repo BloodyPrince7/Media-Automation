@@ -75,7 +75,7 @@ export default function InstagramPreview({ text = '', mediaUrls = [] }) {
           </div>
           <div>
             <div className="flex items-center gap-1">
-              <span className="font-display font-bold text-xs text-[#111116]">pankajkumar_240666</span>
+              <span className="font-display font-bold text-xs text-[#111116]">creator_studio</span>
               <span className="w-1 h-1 rounded-full bg-neutral-300" />
               <button type="button" className="text-xs font-semibold text-[#0095f6] hover:text-[#00376b]">
                 Follow
@@ -144,7 +144,7 @@ export default function InstagramPreview({ text = '', mediaUrls = [] }) {
 
         {/* Caption & Hashtags */}
         <div className="text-xs leading-relaxed break-words text-[#111116] mb-1.5">
-          <span className="font-display font-bold mr-1.5">pankajkumar_240666</span>
+          <span className="font-display font-bold mr-1.5">creator_studio</span>
           {renderFormattedCaption(text)}
         </div>
 

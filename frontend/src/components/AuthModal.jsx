@@ -8,7 +8,6 @@ import {
   EyeOff,
   Sparkles,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
   AlertCircle,
   Zap,
@@ -320,13 +319,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
             </button>
           </div>
         </form>
-
-        {/* Footer Guarantee */}
-        <div className="mt-6 pt-4 border-t-2 border-[#111116]/10 flex items-center justify-center gap-2 text-[10px] font-bold text-[#111116]/60">
-          <ShieldCheck size={13} className="text-[#059669]" />
-          <span>Local SQLite Encrypted Storage · Zero External Cloud Tracking</span>
-        </div>
-
       </div>
     </div>
   );

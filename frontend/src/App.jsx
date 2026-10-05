@@ -28,7 +28,7 @@ import SettingsModal from './components/SettingsModal';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MediaAdvisorBot from './components/MediaAdvisorBot';
 import FloatingObjectsStage from './components/FloatingObjectsStage';
-import AuthModal from './components/AuthModal';
+import AuthScreen from './components/AuthScreen';
 import { getPosts, getHealth, getSettings, getCurrentUser, logoutUser } from './api/client';
 
 export default function App() {
@@ -46,14 +46,13 @@ export default function App() {
   // Authentication state
   const [currentUser, setCurrentUser] = useState(() => {
     try {
+      const token = localStorage.getItem('social_pulse_token');
       const saved = localStorage.getItem('social_pulse_user');
-      return saved ? JSON.parse(saved) : null;
+      return token && saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
   });
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState('login');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   // Live draft preview state
@@ -61,20 +60,33 @@ export default function App() {
   const [liveMediaUrls, setLiveMediaUrls] = useState([]);
 
   useEffect(() => {
-    fetchInitialData();
+    if (currentUser) {
+      fetchInitialData();
+    }
     checkAuth();
   }, []);
 
   const checkAuth = async () => {
     try {
       const token = localStorage.getItem('social_pulse_token');
+      if (!token) {
+        setCurrentUser(null);
+        return;
+      }
       const user = await getCurrentUser(token);
       if (user) {
         setCurrentUser(user);
         localStorage.setItem('social_pulse_user', JSON.stringify(user));
+        fetchInitialData();
+      } else {
+        setCurrentUser(null);
+        localStorage.removeItem('social_pulse_token');
+        localStorage.removeItem('social_pulse_user');
       }
     } catch (err) {
-      // Guest or session expired
+      setCurrentUser(null);
+      localStorage.removeItem('social_pulse_token');
+      localStorage.removeItem('social_pulse_user');
     }
   };
 
@@ -117,6 +129,18 @@ export default function App() {
   };
 
   const scheduledCount = posts.filter(p => p.status === 'SCHEDULED').length;
+
+  // First page is Register & Login if not authenticated
+  if (!currentUser) {
+    return (
+      <AuthScreen
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
+          fetchInitialData();
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fef7e6] text-[#111116] flex flex-col font-sans selection:bg-[#6a6afe] selection:text-white relative overflow-x-hidden">
@@ -596,16 +620,6 @@ export default function App() {
         onClose={() => {
           setIsSettingsOpen(false);
           fetchInitialData();
-        }}
-      />
-
-      {/* Auth Modal for Login and Register */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        initialMode={authMode}
-        onClose={() => setIsAuthOpen(false)}
-        onAuthSuccess={(user) => {
-          setCurrentUser(user);
         }}
       />
 

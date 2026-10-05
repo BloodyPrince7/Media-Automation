@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.config import settings, UPLOADS_DIR
 from app.database import get_db, init_db
 from app.models import Post, PublishLog, PostComment, User
-from app.auth import hash_password, verify_password, generate_session_token, seed_demo_user_if_needed
+from app.auth import hash_password, verify_password, generate_session_token
 from app.schemas import (
     PostCreate, PostUpdate, PostOut,
     SettingsOut, SettingsUpdate,
@@ -33,12 +33,6 @@ from app.ai_service import adapt_content_with_gemini, suggest_reply_with_gemini,
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    # Seed demo user if no users exist
-    try:
-        db = next(get_db())
-        seed_demo_user_if_needed(db)
-    except Exception as e:
-        print(f"WARN: Could not seed initial user: {e}")
     start_scheduler()
     yield
     shutdown_scheduler()
@@ -150,11 +144,6 @@ def get_current_user(token: Optional[str] = Query(None), db: Session = Depends(g
         user = db.query(User).filter(User.session_token == token).first()
         if user:
             return UserOut.model_validate(user)
-
-    # Fallback to demo user if available
-    user = db.query(User).first()
-    if user:
-        return UserOut.model_validate(user)
     raise HTTPException(status_code=401, detail="Not authenticated.")
 
 

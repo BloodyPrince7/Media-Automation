@@ -328,7 +328,7 @@ export default function SocialPostCard({ post, onRefresh }) {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-white text-[15px] hover:text-[#70b5f8] cursor-pointer">Pankaj kumar</span>
+                  <span className="font-semibold text-white text-[15px] hover:text-[#70b5f8] cursor-pointer">Creator</span>
                   <span className="text-xs text-neutral-400">• 1st</span>
                 </div>
                 <p className="text-xs text-neutral-400 line-clamp-1">Building Automation & Software Systems</p>
@@ -365,7 +365,7 @@ export default function SocialPostCard({ post, onRefresh }) {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-white text-[14px] hover:underline cursor-pointer">pankajkumar_240666</span>
+                  <span className="font-bold text-white text-[14px] hover:underline cursor-pointer">creator_studio</span>
                 </div>
                 <div className="flex items-center gap-1 text-[11px] text-neutral-400 mt-0.5">
                   <span>Original Audio</span>

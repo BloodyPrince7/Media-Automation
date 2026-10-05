@@ -88,7 +88,7 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
   };
 
   const liStat = platformStats.find(p => p.platform === 'linkedin') || {
-    handle_or_name: 'Pankaj kumar',
+    handle_or_name: 'Connected Account',
     total_posts: 0,
     total_likes: 0,
     total_comments: 0,
@@ -97,7 +97,7 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
   };
 
   const igStat = platformStats.find(p => p.platform === 'instagram') || {
-    handle_or_name: '@pankajkumar_240666',
+    handle_or_name: '@connected_channel',
     total_posts: 0,
     total_likes: 0,
     total_comments: 0,

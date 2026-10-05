@@ -25,26 +25,3 @@ def verify_password(password: str, stored_hash: str, salt: str) -> bool:
 def generate_session_token() -> str:
     """Generates a secure cryptographically random session token."""
     return secrets.token_urlsafe(32)
-
-def seed_demo_user_if_needed(db: Session):
-    """Ensures at least one primary admin/creator user exists for instant 1-click test."""
-    try:
-        user_count = db.query(User).count()
-        if user_count == 0:
-            pw_hash, salt = hash_password("password123")
-            demo_user = User(
-                username="pankaj",
-                email="pankaj@socialpulse.studio",
-                full_name="Pankaj Kumar",
-                password_hash=pw_hash,
-                salt=salt,
-                role="ADMIN",
-                avatar_color="#6a6afe",
-                session_token=generate_session_token()
-            )
-            db.add(demo_user)
-            db.commit()
-            print("INFO: Initial demo user 'pankaj' created successfully.")
-    except Exception as e:
-        db.rollback()
-        print(f"WARN: Failed to seed demo user: {e}")
