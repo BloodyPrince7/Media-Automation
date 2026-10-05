@@ -182,3 +182,34 @@ class AnalyticsOverviewResponse(BaseModel):
     weekly_activity: List[dict] = []
 
 
+# --- AUTH SCHEMAS ---
+class UserRegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    full_name: Optional[str] = None
+
+class UserLoginRequest(BaseModel):
+    username_or_email: str
+    password: str
+
+class UserOut(BaseModel):
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    role: str
+    avatar_color: str
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class AuthResponse(BaseModel):
+    success: bool
+    message: str
+    token: str
+    user: UserOut
+
+
+

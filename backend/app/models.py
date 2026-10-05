@@ -88,6 +88,20 @@ class PostComment(Base):
     is_author_reply = Column(Integer, default=1)  # 1 if sent from our dashboard, 0 if received
     parent_comment_id = Column(String(255), nullable=True)
     platform_comment_id = Column(String(255), nullable=True)
-    created_at = Column(DateTime(timezone=True), default=utc_now)
-
     post = relationship("Post", back_populates="comments")
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(100), unique=True, index=True, nullable=False)
+    email = Column(String(255), unique=True, index=True, nullable=False)
+    full_name = Column(String(255), nullable=True)
+    password_hash = Column(String(255), nullable=False)
+    salt = Column(String(100), nullable=False)
+    role = Column(String(50), default="CREATOR")
+    avatar_color = Column(String(50), default="#6a6afe")
+    session_token = Column(String(255), nullable=True, index=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)

@@ -13,7 +13,10 @@ import {
   Layers,
   MessageSquare,
   BarChart2,
-  TrendingUp
+  TrendingUp,
+  LogOut,
+  ChevronDown,
+  LogIn
 } from 'lucide-react';
 import Composer from './components/Composer';
 import XPreview from './components/XPreview';
@@ -25,7 +28,8 @@ import SettingsModal from './components/SettingsModal';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MediaAdvisorBot from './components/MediaAdvisorBot';
 import FloatingObjectsStage from './components/FloatingObjectsStage';
-import { getPosts, getHealth, getSettings } from './api/client';
+import AuthModal from './components/AuthModal';
+import { getPosts, getHealth, getSettings, getCurrentUser, logoutUser } from './api/client';
 
 export default function App() {
   const [activeView, setActiveView] = useState('studio'); // 'studio' | 'queue' | 'history'
@@ -39,13 +43,49 @@ export default function App() {
   const [settingsData, setSettingsData] = useState(null);
   const [editingPost, setEditingPost] = useState(null);
 
+  // Authentication state
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('social_pulse_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   // Live draft preview state
   const [livePreviewText, setLivePreviewText] = useState(null);
   const [liveMediaUrls, setLiveMediaUrls] = useState([]);
 
   useEffect(() => {
     fetchInitialData();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const token = localStorage.getItem('social_pulse_token');
+      const user = await getCurrentUser(token);
+      if (user) {
+        setCurrentUser(user);
+        localStorage.setItem('social_pulse_user', JSON.stringify(user));
+      }
+    } catch (err) {
+      // Guest or session expired
+    }
+  };
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem('social_pulse_token');
+    await logoutUser(token).catch(() => {});
+    localStorage.removeItem('social_pulse_token');
+    localStorage.removeItem('social_pulse_user');
+    setCurrentUser(null);
+    setIsUserMenuOpen(false);
+  };
 
   const fetchInitialData = async () => {
     setLoadingPosts(true);
@@ -156,8 +196,8 @@ export default function App() {
           </button>
         </nav>
 
-        {/* Action Controls & Gateways Button */}
-        <div className="flex items-center gap-2.5">
+        {/* Action Controls, Gateways & User Profile */}
+        <div className="flex items-center gap-2">
           <button
             onClick={fetchInitialData}
             className="w-9 h-9 rounded-full bg-white border-2 border-[#111116] flex items-center justify-center text-[#111116] hover:bg-[#ffe400] shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
@@ -168,11 +208,88 @@ export default function App() {
 
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="px-4 py-1.5 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-bold text-xs shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] font-display font-bold text-xs shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all items-center gap-1.5 cursor-pointer"
           >
             <Settings className="w-3.5 h-3.5" />
-            <span>Channel Settings</span>
+            <span>Gateways</span>
           </button>
+
+          {/* User Account / Auth Trigger */}
+          {currentUser ? (
+            <div className="relative">
+              {isUserMenuOpen && (
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setIsUserMenuOpen(false)}
+                />
+              )}
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="relative z-50 pl-1.5 pr-3 py-1 rounded-full bg-white border-2 border-[#111116] shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span
+                  className="w-6 h-6 rounded-full border border-[#111116] text-white flex items-center justify-center font-display font-black text-xs shadow-xs"
+                  style={{ backgroundColor: currentUser.avatar_color || '#6a6afe' }}
+                >
+                  {(currentUser.full_name || currentUser.username || 'U')[0].toUpperCase()}
+                </span>
+                <span className="text-xs font-display font-bold text-[#111116] max-w-[90px] sm:max-w-[120px] truncate">
+                  {currentUser.full_name || currentUser.username}
+                </span>
+                <ChevronDown size={12} className={`text-[#111116]/60 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Neo-Brutalist User Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-[#fef7e6] border-2 border-[#111116] rounded-2xl shadow-[4px_4px_0px_#111116] p-3 z-50 view-enter">
+                  <div className="pb-2.5 mb-2 border-b-2 border-[#111116]/10">
+                    <p className="text-xs font-display font-black text-[#111116] truncate">
+                      {currentUser.full_name || currentUser.username}
+                    </p>
+                    <p className="text-[10px] text-[#111116]/60 font-mono truncate">
+                      {currentUser.email}
+                    </p>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[#6CEBB0] text-[#111116] border border-[#111116]">
+                      {currentUser.role || 'CREATOR'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => { setIsSettingsOpen(true); setIsUserMenuOpen(false); }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-display font-bold hover:bg-[#ffe400] transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <Settings size={13} />
+                      <span>Channel Settings</span>
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-2.5 py-1.5 rounded-xl text-xs font-display font-bold hover:bg-[#ff6a91] hover:text-white transition-colors flex items-center gap-2 text-[#ff6a91] cursor-pointer"
+                    >
+                      <LogOut size={13} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => { setAuthMode('login'); setIsAuthOpen(true); }}
+                className="px-3.5 py-1.5 rounded-full bg-[#6a6afe] text-white border-2 border-[#111116] font-display font-bold text-xs shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <LogIn size={13} />
+                <span>Sign In</span>
+              </button>
+              <button
+                onClick={() => { setAuthMode('register'); setIsAuthOpen(true); }}
+                className="hidden sm:inline-flex px-3 py-1.5 rounded-full bg-white hover:bg-[#ff6a91] hover:text-white text-[#111116] border-2 border-[#111116] font-display font-bold text-xs shadow-[2px_2px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all cursor-pointer"
+              >
+                <span>Register</span>
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -479,6 +596,16 @@ export default function App() {
         onClose={() => {
           setIsSettingsOpen(false);
           fetchInitialData();
+        }}
+      />
+
+      {/* Auth Modal for Login and Register */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        initialMode={authMode}
+        onClose={() => setIsAuthOpen(false)}
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
         }}
       />
 

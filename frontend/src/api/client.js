@@ -99,6 +99,29 @@ export const getAnalyticsOverview = async () => {
   return res.data;
 };
 
+export const loginUser = async (username_or_email, password) => {
+  const res = await api.post('/auth/login', { username_or_email, password });
+  return res.data;
+};
+
+export const registerUser = async (username, email, password, full_name) => {
+  const res = await api.post('/auth/register', { username, email, password, full_name });
+  return res.data;
+};
+
+export const getCurrentUser = async (token = null) => {
+  const params = token ? { token } : {};
+  const res = await api.get('/auth/me', { params });
+  return res.data;
+};
+
+export const logoutUser = async (token = null) => {
+  const params = token ? { token } : {};
+  const res = await api.post('/auth/logout', null, { params });
+  return res.data;
+};
+
 export default api;
+
 
 

@@ -12,7 +12,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings, UPLOADS_DIR
 from app.database import get_db, init_db
-from app.models import Post, PublishLog, PostComment
+from app.models import Post, PublishLog, PostComment, User
+from app.auth import hash_password, verify_password, generate_session_token, seed_demo_user_if_needed
 from app.schemas import (
     PostCreate, PostUpdate, PostOut,
     SettingsOut, SettingsUpdate,
@@ -22,7 +23,8 @@ from app.schemas import (
     PlatformMetrics, PostEngagementOut,
     AISuggestReplyRequest, AISuggestReplyResponse,
     SocialAdvisorRequest, SocialAdvisorResponse,
-    AnalyticsOverviewResponse, PlatformStatSummary
+    AnalyticsOverviewResponse, PlatformStatSummary,
+    UserRegisterRequest, UserLoginRequest, UserOut, AuthResponse
 )
 from app.publishers import get_publisher
 from app.scheduler import start_scheduler, shutdown_scheduler, execute_post_publication
@@ -31,6 +33,12 @@ from app.ai_service import adapt_content_with_gemini, suggest_reply_with_gemini,
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    # Seed demo user if no users exist
+    try:
+        db = next(get_db())
+        seed_demo_user_if_needed(db)
+    except Exception as e:
+        print(f"WARN: Could not seed initial user: {e}")
     start_scheduler()
     yield
     shutdown_scheduler()
@@ -62,6 +70,102 @@ def health_check():
         "status": "online",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
+
+
+# --- AUTHENTICATION ENDPOINTS ---
+@app.post("/api/auth/register", response_model=AuthResponse)
+def register_user(payload: UserRegisterRequest, db: Session = Depends(get_db)):
+    username_clean = payload.username.strip().lower()
+    email_clean = payload.email.strip().lower()
+    
+    if len(username_clean) < 3:
+        raise HTTPException(status_code=400, detail="Username must be at least 3 characters.")
+    if len(payload.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+    if "@" not in email_clean:
+        raise HTTPException(status_code=400, detail="Please provide a valid email address.")
+
+    # Check if username exists
+    if db.query(User).filter(User.username == username_clean).first():
+        raise HTTPException(status_code=400, detail="Username is already taken.")
+
+    # Check if email exists
+    if db.query(User).filter(User.email == email_clean).first():
+        raise HTTPException(status_code=400, detail="Email is already registered.")
+
+    pw_hash, salt = hash_password(payload.password)
+    session_token = generate_session_token()
+    
+    avatar_colors = ["#6a6afe", "#ff6a91", "#ffe400", "#6CEBB0"]
+    avatar_color = avatar_colors[len(username_clean) % len(avatar_colors)]
+
+    new_user = User(
+        username=username_clean,
+        email=email_clean,
+        full_name=payload.full_name or username_clean.capitalize(),
+        password_hash=pw_hash,
+        salt=salt,
+        role="CREATOR",
+        avatar_color=avatar_color,
+        session_token=session_token
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return AuthResponse(
+        success=True,
+        message="Account created successfully! Welcome to Social Pulse Studio.",
+        token=session_token,
+        user=UserOut.model_validate(new_user)
+    )
+
+
+@app.post("/api/auth/login", response_model=AuthResponse)
+def login_user(payload: UserLoginRequest, db: Session = Depends(get_db)):
+    identifier = payload.username_or_email.strip().lower()
+    user = db.query(User).filter(
+        (User.username == identifier) | (User.email == identifier)
+    ).first()
+
+    if not user or not verify_password(payload.password, user.password_hash, user.salt):
+        raise HTTPException(status_code=401, detail="Invalid username/email or password.")
+
+    token = generate_session_token()
+    user.session_token = token
+    db.commit()
+    db.refresh(user)
+
+    return AuthResponse(
+        success=True,
+        message=f"Welcome back, {user.full_name or user.username}!",
+        token=token,
+        user=UserOut.model_validate(user)
+    )
+
+
+@app.get("/api/auth/me", response_model=UserOut)
+def get_current_user(token: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    if token:
+        user = db.query(User).filter(User.session_token == token).first()
+        if user:
+            return UserOut.model_validate(user)
+
+    # Fallback to demo user if available
+    user = db.query(User).first()
+    if user:
+        return UserOut.model_validate(user)
+    raise HTTPException(status_code=401, detail="Not authenticated.")
+
+
+@app.post("/api/auth/logout")
+def logout_user(token: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    if token:
+        user = db.query(User).filter(User.session_token == token).first()
+        if user:
+            user.session_token = None
+            db.commit()
+    return {"success": True, "message": "Signed out successfully."}
 
 
 # --- POST VALIDATION ---
