@@ -190,7 +190,7 @@ export default function MediaAdvisorBot() {
     <div className="fixed bottom-6 right-6 z-50">
       {/* Bot Chat Window */}
       {isOpen && (
-        <div className="w-[380px] sm:w-[420px] h-[580px] max-h-[85vh] bg-[#fef7e6] rounded-[28px] border-2 border-[#111116] shadow-[8px_8px_0px_#111116] flex flex-col overflow-hidden mb-3 animate-fade-in transition-all text-[#111116]">
+        <div className="w-[380px] sm:w-[420px] h-[580px] max-h-[85vh] bg-[#fef7e6] rounded-[28px] border-2 border-[#111116] shadow-[8px_8px_0px_#111116] flex flex-col overflow-hidden mb-3 view-enter transition-all text-[#111116]">
           
           {/* Header */}
           <div className="px-5 py-3.5 bg-[#6a6afe] text-white border-b-2 border-[#111116] flex items-center justify-between shadow-xs">
@@ -349,25 +349,33 @@ export default function MediaAdvisorBot() {
         </div>
       )}
 
-      {/* Floating Trigger Pill (Doooing Playful Style) */}
+      {/* Floating Trigger Pill with Animated Radar Beacon */}
       {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="group relative flex items-center gap-3 bg-[#ffe400] hover:bg-[#ffed4a] text-[#111116] pl-3.5 pr-4 py-2.5 rounded-full border-2 border-[#111116] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] transition-all cursor-pointer"
-          title="Open AI Social Media Advisor"
-        >
-          <div className="w-8 h-8 rounded-full bg-[#ff6a91] border-2 border-[#111116] text-white flex items-center justify-center shadow-[1px_1px_0px_#111116] group-hover:rotate-12 transition-transform">
-            <Sparkles size={16} />
-          </div>
+        <div className="relative">
+          {/* Animated Motion Pulse Ring */}
+          <span className="absolute -inset-1.5 rounded-full bg-[#ffe400]/60 animate-pulse-radar pointer-events-none -z-10" />
 
-          <div className="flex flex-col text-left">
-            <span className="text-xs font-display font-black leading-tight tracking-tight flex items-center gap-1.5">
-              AI Advisor
-              <span className="w-2 h-2 rounded-full bg-[#6CEBB0] border border-[#111116] animate-ping" />
-            </span>
-            <span className="text-[10px] font-bold text-[#111116]/70 leading-none">Captions & Growth</span>
-          </div>
-        </button>
+          <button
+            onClick={() => setIsOpen(true)}
+            className="group relative flex items-center gap-3 bg-[#ffe400] hover:bg-[#ffed4a] text-[#111116] pl-3.5 pr-4 py-2.5 rounded-full border-2 border-[#111116] shadow-[4px_4px_0px_#111116] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_#111116] spring-hover transition-all cursor-pointer"
+            title="Open AI Social Media Advisor"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#ff6a91] border-2 border-[#111116] text-white flex items-center justify-center shadow-[1px_1px_0px_#111116] group-hover:rotate-12 group-hover:scale-110 transition-transform">
+              <Sparkles size={16} />
+            </div>
+
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-display font-black leading-tight tracking-tight flex items-center gap-1.5">
+                AI Advisor
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6CEBB0] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#6CEBB0] border border-[#111116]"></span>
+                </span>
+              </span>
+              <span className="text-[10px] font-bold text-[#111116]/70 leading-none">Captions & Growth</span>
+            </div>
+          </button>
+        </div>
       )}
     </div>
   );

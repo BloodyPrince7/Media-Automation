@@ -245,8 +245,12 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
                     <p className="text-xs text-[#111116]/60 font-mono font-bold">{xStat.handle_or_name}</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
-                  <CheckCircle2 size={10} /> Active
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6CEBB0] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#059669]"></span>
+                  </span>
+                  <span>Active</span>
                 </span>
               </div>
 
@@ -296,8 +300,12 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
                     <p className="text-xs text-[#111116]/60 font-bold">{liStat.handle_or_name}</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
-                  <CheckCircle2 size={10} /> Active
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6CEBB0] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#059669]"></span>
+                  </span>
+                  <span>Active</span>
                 </span>
               </div>
 
@@ -347,8 +355,12 @@ export default function AnalyticsDashboard({ onNavigateToComposer }) {
                     <p className="text-xs text-[#111116]/60 font-mono font-bold">{igStat.handle_or_name}</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
-                  <CheckCircle2 size={10} /> Active
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#e8f8f0] text-[#2e7d32] border border-[#111116]">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6CEBB0] opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#059669]"></span>
+                  </span>
+                  <span>Active</span>
                 </span>
               </div>
 

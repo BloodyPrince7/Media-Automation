@@ -24,6 +24,7 @@ import PostHistory from './components/PostHistory';
 import SettingsModal from './components/SettingsModal';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MediaAdvisorBot from './components/MediaAdvisorBot';
+import MotionMarquee from './components/MotionMarquee';
 import { getPosts, getHealth, getSettings } from './api/client';
 
 export default function App() {
@@ -175,36 +176,63 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── HERO BANNER ── */}
+      {/* ── HERO BANNER WITH MOTION GRAPHICS ── */}
       <section className="relative pt-12 pb-14 sm:pt-16 sm:pb-20 text-center max-w-5xl mx-auto px-6 overflow-visible">
         
-        {/* Refined Professional Capability Pills */}
-        <div className="hidden sm:inline-flex absolute top-6 left-2 sm:left-4 rotate-[-3deg] neo-pill bg-[#ffe400] text-[#111116]">
+        {/* Animated Floating Neo-Brutalist Sticker Badges */}
+        <div className="hidden sm:inline-flex absolute top-6 left-2 sm:left-4 sticker-float-1 neo-pill bg-[#ffe400] text-[#111116] cursor-pointer">
+          <Sparkles className="w-3.5 h-3.5 text-[#111116]" />
           <span>Multi-Channel Distribution</span>
         </div>
 
-        <div className="hidden sm:inline-flex absolute top-8 right-2 sm:right-6 rotate-[2.5deg] neo-pill bg-[#6CEBB0] text-[#111116]">
+        <div className="hidden sm:inline-flex absolute top-8 right-2 sm:right-6 sticker-float-2 neo-pill bg-[#6CEBB0] text-[#111116] cursor-pointer">
+          <Zap className="w-3.5 h-3.5 text-[#111116]" />
           <span>Intelligent Content Adaptation</span>
         </div>
 
-        <div className="hidden md:inline-flex absolute bottom-8 left-12 rotate-[2deg] neo-pill bg-[#ff6a91] text-white">
+        <div className="hidden md:inline-flex absolute bottom-8 left-12 sticker-float-3 neo-pill bg-[#ff6a91] text-white cursor-pointer">
+          <MessageSquare className="w-3.5 h-3.5 text-white" />
           <span>Unified Reply Stream</span>
         </div>
 
-        <div className="hidden md:inline-flex absolute bottom-10 right-14 rotate-[-2.5deg] neo-pill bg-[#6a6afe] text-white">
+        <div className="hidden md:inline-flex absolute bottom-10 right-14 sticker-float-4 neo-pill bg-[#6a6afe] text-white cursor-pointer">
+          <TrendingUp className="w-3.5 h-3.5 text-white" />
           <span>Real-Time Performance Metrics</span>
         </div>
 
-        {/* Small Editorial Category Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border-2 border-[#111116] bg-white text-xs font-display font-bold text-[#111116] mb-5 shadow-[2px_2px_0px_#111116]">
-          <span className="w-2 h-2 rounded-full bg-[#6a6afe]" />
+        {/* Animated Neo-Brutalist Spinning Sunburst Badge */}
+        <div className="hidden lg:flex absolute -top-3 right-6 z-20 items-center justify-center pointer-events-auto group cursor-pointer" title="AI-Engineered Multi-Channel Automation">
+          <div className="w-20 h-20 rounded-full bg-[#ffe400] border-2 border-[#111116] shadow-[3px_3px_0px_#111116] flex items-center justify-center relative animate-spin-slow group-hover:[animation-play-state:paused] transition-transform">
+            <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
+              <path
+                id="sunburstText"
+                d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0"
+              />
+              <text className="text-[10px] font-display font-black uppercase tracking-[0.22em] fill-[#111116]">
+                <textPath href="#sunburstText" startOffset="0%">
+                  ★ AUTO BROADCAST ★ AI ENGINE
+                </textPath>
+              </text>
+            </svg>
+          </div>
+          <div className="absolute w-8 h-8 rounded-full bg-[#6a6afe] border-2 border-[#111116] flex items-center justify-center text-white shadow-[1px_1px_0px_#111116] group-hover:scale-125 transition-transform">
+            <Zap className="w-4 h-4 fill-white" />
+          </div>
+        </div>
+
+        {/* Small Editorial Category Pill with Pulsing Live Beacon */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border-2 border-[#111116] bg-white text-xs font-display font-bold text-[#111116] mb-5 shadow-[2px_2px_0px_#111116] spring-hover cursor-default">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6a6afe] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#6a6afe]"></span>
+          </span>
           <span>Unified Social Publishing Engine</span>
         </div>
 
         {/* Monumental Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight leading-[1.05] mb-5 text-[#111116]">
           Publish with precision.{' '}
-          <span className="bg-[#ff6a91] text-white px-3 sm:px-4 py-0.5 rounded-2xl rotate-[-1deg] inline-block shadow-[4px_4px_0px_#111116]">
+          <span className="bg-[#ff6a91] text-white px-3 sm:px-4 py-0.5 rounded-2xl rotate-[-1deg] inline-block shadow-[4px_4px_0px_#111116] hover:rotate-[1deg] transition-transform">
             Engage in real-time.
           </span>
         </h1>
@@ -214,6 +242,9 @@ export default function App() {
           Coordinate content across your publishing channels from a single workbench. Craft tailored variations, preview authentic feeds, schedule campaigns, and respond to audience threads in real time.
         </p>
       </section>
+
+      {/* ── MOTION GRAPHICS INFINITE MARQUEE RIBBON ── */}
+      <MotionMarquee />
 
       {/* ── ORGANIC WAVE SCOOP DIVIDER ── */}
       <div className="w-full relative leading-none -mb-[1px]">
@@ -262,183 +293,186 @@ export default function App() {
             </button>
           </div>
 
-          {/* STUDIO VIEW */}
-          {activeView === 'studio' && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Left Column: Studio Composer */}
-              <div className="lg:col-span-7 flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-1">
-                  <div>
-                    <h2 className="text-2xl font-display font-bold text-[#111116] flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full bg-[#6a6afe] border-1.5 border-[#111116]" />
-                      <span>{editingPost ? 'Edit Campaign Draft' : 'Compose & Distribute'}</span>
-                    </h2>
-                    <p className="text-xs text-[#111116]/70 font-medium">
-                      Author your message, adapt for destination channels, and coordinate publication.
-                    </p>
+          {/* Dynamic View Container with Animated Pop-in Transition */}
+          <div key={activeView} className="view-enter">
+            {/* STUDIO VIEW */}
+            {activeView === 'studio' && (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left Column: Studio Composer */}
+                <div className="lg:col-span-7 flex flex-col gap-4">
+                  <div className="flex items-center justify-between pb-1">
+                    <div>
+                      <h2 className="text-2xl font-display font-bold text-[#111116] flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full bg-[#6a6afe] border-1.5 border-[#111116]" />
+                        <span>{editingPost ? 'Edit Campaign Draft' : 'Compose & Distribute'}</span>
+                      </h2>
+                      <p className="text-xs text-[#111116]/70 font-medium">
+                        Author your message, adapt for destination channels, and coordinate publication.
+                      </p>
+                    </div>
+
+                    {editingPost && (
+                      <button
+                        onClick={() => setEditingPost(null)}
+                        className="px-3 py-1 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] text-xs font-display font-bold shadow-[2px_2px_0px_#111116] cursor-pointer"
+                      >
+                        Clear Edit
+                      </button>
+                    )}
                   </div>
 
-                  {editingPost && (
-                    <button
-                      onClick={() => setEditingPost(null)}
-                      className="px-3 py-1 rounded-full bg-[#ffe400] text-[#111116] border-2 border-[#111116] text-xs font-display font-bold shadow-[2px_2px_0px_#111116] cursor-pointer"
-                    >
-                      Clear Edit
-                    </button>
-                  )}
+                  <Composer
+                    onPostCreated={handlePostCreated}
+                    selectedPostToEdit={editingPost}
+                    onDraftChange={(draft) => {
+                      setLivePreviewText(draft);
+                      setLiveMediaUrls(draft.mediaUrls || []);
+                    }}
+                  />
                 </div>
 
-                <Composer
-                  onPostCreated={handlePostCreated}
-                  selectedPostToEdit={editingPost}
-                  onDraftChange={(draft) => {
-                    setLivePreviewText(draft);
-                    setLiveMediaUrls(draft.mediaUrls || []);
-                  }}
-                />
-              </div>
+                {/* Right Column: Live Feed Simulator */}
+                <div className="lg:col-span-5 flex flex-col gap-4">
+                  <div className="flex items-center justify-between pb-1 border-b-2 border-[#111116]/10">
+                    <span className="text-xs font-display font-bold uppercase tracking-wider text-[#111116] flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-[#6a6afe]" />
+                      Channel Simulation
+                    </span>
 
-              {/* Right Column: Live Feed Simulator */}
-              <div className="lg:col-span-5 flex flex-col gap-4">
-                <div className="flex items-center justify-between pb-1 border-b-2 border-[#111116]/10">
-                  <span className="text-xs font-display font-bold uppercase tracking-wider text-[#111116] flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-[#6a6afe]" />
-                    Channel Simulation
-                  </span>
+                    {/* Switcher Pills */}
+                    <div className="flex items-center gap-1 bg-[#fef7e6] border-2 border-[#111116] p-1 rounded-full text-xs font-display font-bold shadow-[2px_2px_0px_#111116] flex-wrap">
+                      <button
+                        onClick={() => setPreviewTab('x')}
+                        className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                          previewTab === 'x'
+                            ? 'bg-[#111116] text-white shadow-sm'
+                            : 'text-[#111116] hover:bg-white'
+                        }`}
+                      >
+                        X (Twitter)
+                      </button>
+                      <button
+                        onClick={() => setPreviewTab('linkedin')}
+                        className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                          previewTab === 'linkedin'
+                            ? 'bg-[#6a6afe] text-white shadow-sm'
+                            : 'text-[#111116] hover:bg-white'
+                        }`}
+                      >
+                        LinkedIn
+                      </button>
+                      <button
+                        onClick={() => setPreviewTab('instagram')}
+                        className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                          previewTab === 'instagram'
+                            ? 'bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-sm'
+                            : 'text-[#111116] hover:bg-white'
+                        }`}
+                      >
+                        Instagram
+                      </button>
+                      <button
+                        onClick={() => setPreviewTab('both')}
+                        className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+                          previewTab === 'both'
+                            ? 'bg-[#ff6a91] text-white shadow-sm'
+                            : 'text-[#111116] hover:bg-white'
+                        }`}
+                      >
+                        All Channels
+                      </button>
+                    </div>
+                  </div>
 
-                  {/* Switcher Pills */}
-                  <div className="flex items-center gap-1 bg-[#fef7e6] border-2 border-[#111116] p-1 rounded-full text-xs font-display font-bold shadow-[2px_2px_0px_#111116] flex-wrap">
-                    <button
-                      onClick={() => setPreviewTab('x')}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        previewTab === 'x'
-                          ? 'bg-[#111116] text-white shadow-sm'
-                          : 'text-[#111116] hover:bg-white'
-                      }`}
-                    >
-                      X (Twitter)
-                    </button>
-                    <button
-                      onClick={() => setPreviewTab('linkedin')}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        previewTab === 'linkedin'
-                          ? 'bg-[#6a6afe] text-white shadow-sm'
-                          : 'text-[#111116] hover:bg-white'
-                      }`}
-                    >
-                      LinkedIn
-                    </button>
-                    <button
-                      onClick={() => setPreviewTab('instagram')}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        previewTab === 'instagram'
-                          ? 'bg-gradient-to-r from-[#f09433] via-[#dc2743] to-[#bc1888] text-white shadow-sm'
-                          : 'text-[#111116] hover:bg-white'
-                      }`}
-                    >
-                      Instagram
-                    </button>
-                    <button
-                      onClick={() => setPreviewTab('both')}
-                      className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                        previewTab === 'both'
-                          ? 'bg-[#ff6a91] text-white shadow-sm'
-                          : 'text-[#111116] hover:bg-white'
-                      }`}
-                    >
-                      All Channels
-                    </button>
+                  {/* Simulator Previews Container */}
+                  <div className="space-y-4">
+                    {(previewTab === 'x' || previewTab === 'both') && (
+                      <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                          <span className="text-xs font-display font-bold text-[#111116] flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-[#111116]" />
+                            Feed Simulation (Short-Form)
+                          </span>
+                          <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                            {livePreviewText?.xContent?.length || livePreviewText?.content?.length || 0}/280
+                          </span>
+                        </div>
+                        <XPreview
+                          text={livePreviewText?.xContent || livePreviewText?.content || editingPost?.x_content || editingPost?.content || ''}
+                          mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                          charValidation={true}
+                        />
+                      </div>
+                    )}
+
+                    {(previewTab === 'linkedin' || previewTab === 'both') && (
+                      <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                          <span className="text-xs font-display font-bold text-[#6a6afe] flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-[#6a6afe]" />
+                            Feed Simulation (Long-Form)
+                          </span>
+                          <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                            {livePreviewText?.linkedinContent?.length || livePreviewText?.content?.length || 0}/3000
+                          </span>
+                        </div>
+                        <LinkedInPreview
+                          text={livePreviewText?.linkedinContent || livePreviewText?.content || editingPost?.linkedin_content || editingPost?.content || ''}
+                          mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                        />
+                      </div>
+                    )}
+
+                    {(previewTab === 'instagram' || previewTab === 'both') && (
+                      <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
+                        <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
+                          <span className="text-xs font-display font-bold text-[#dc2743] flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-[#dc2743]" />
+                            Feed Simulation (Visual & Storytelling)
+                          </span>
+                          <span className="text-[11px] font-mono font-bold text-[#111116]/60">
+                            {livePreviewText?.instagramContent?.length || livePreviewText?.content?.length || 0}/2200
+                          </span>
+                        </div>
+                        <InstagramPreview
+                          text={livePreviewText?.instagramContent || livePreviewText?.content || editingPost?.instagram_content || editingPost?.content || ''}
+                          mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Simulator Previews Container */}
-                <div className="space-y-4">
-                  {(previewTab === 'x' || previewTab === 'both') && (
-                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
-                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
-                        <span className="text-xs font-display font-bold text-[#111116] flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#111116]" />
-                          Feed Simulation (Short-Form)
-                        </span>
-                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
-                          {livePreviewText?.xContent?.length || livePreviewText?.content?.length || 0}/280
-                        </span>
-                      </div>
-                      <XPreview
-                        text={livePreviewText?.xContent || livePreviewText?.content || editingPost?.x_content || editingPost?.content || ''}
-                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
-                        charValidation={true}
-                      />
-                    </div>
-                  )}
-
-                  {(previewTab === 'linkedin' || previewTab === 'both') && (
-                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
-                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
-                        <span className="text-xs font-display font-bold text-[#6a6afe] flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#6a6afe]" />
-                          Feed Simulation (Long-Form)
-                        </span>
-                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
-                          {livePreviewText?.linkedinContent?.length || livePreviewText?.content?.length || 0}/3000
-                        </span>
-                      </div>
-                      <LinkedInPreview
-                        text={livePreviewText?.linkedinContent || livePreviewText?.content || editingPost?.linkedin_content || editingPost?.content || ''}
-                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
-                      />
-                    </div>
-                  )}
-
-                  {(previewTab === 'instagram' || previewTab === 'both') && (
-                    <div className="neo-box border-2 border-[#111116] p-4 bg-[#fbf6ea] shadow-[4px_4px_0px_#111116]">
-                      <div className="flex items-center justify-between mb-2 pb-2 border-b-2 border-[#111116]/10">
-                        <span className="text-xs font-display font-bold text-[#dc2743] flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#dc2743]" />
-                          Feed Simulation (Visual & Storytelling)
-                        </span>
-                        <span className="text-[11px] font-mono font-bold text-[#111116]/60">
-                          {livePreviewText?.instagramContent?.length || livePreviewText?.content?.length || 0}/2200
-                        </span>
-                      </div>
-                      <InstagramPreview
-                        text={livePreviewText?.instagramContent || livePreviewText?.content || editingPost?.instagram_content || editingPost?.content || ''}
-                        mediaUrls={liveMediaUrls.length > 0 ? liveMediaUrls : (editingPost?.media_urls || [])}
-                      />
-                    </div>
-                  )}
-                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* QUEUE VIEW */}
-          {activeView === 'queue' && (
-            <ScheduledQueue
-              posts={posts}
-              onRefresh={fetchInitialData}
-              onEditPost={handleEditPost}
-            />
-          )}
+            {/* QUEUE VIEW */}
+            {activeView === 'queue' && (
+              <ScheduledQueue
+                posts={posts}
+                onRefresh={fetchInitialData}
+                onEditPost={handleEditPost}
+              />
+            )}
 
-          {/* FEED & ENGAGEMENT VIEW */}
-          {activeView === 'history' && (
-            <PostHistory
-              posts={posts}
-              onRefresh={fetchInitialData}
-            />
-          )}
+            {/* FEED & ENGAGEMENT VIEW */}
+            {activeView === 'history' && (
+              <PostHistory
+                posts={posts}
+                onRefresh={fetchInitialData}
+              />
+            )}
 
-          {/* PERFORMANCE & ANALYTICS VIEW */}
-          {activeView === 'analytics' && (
-            <AnalyticsDashboard
-              onNavigateToComposer={() => {
-                setActiveView('studio');
-                window.scrollTo({ top: 380, behavior: 'smooth' });
-              }}
-            />
-          )}
+            {/* PERFORMANCE & ANALYTICS VIEW */}
+            {activeView === 'analytics' && (
+              <AnalyticsDashboard
+                onNavigateToComposer={() => {
+                  setActiveView('studio');
+                  window.scrollTo({ top: 380, behavior: 'smooth' });
+                }}
+              />
+            )}
+          </div>
 
         </div>
       </section>
