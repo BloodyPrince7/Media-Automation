@@ -24,7 +24,7 @@ import PostHistory from './components/PostHistory';
 import SettingsModal from './components/SettingsModal';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import MediaAdvisorBot from './components/MediaAdvisorBot';
-import MotionMarquee from './components/MotionMarquee';
+import FloatingObjectsStage from './components/FloatingObjectsStage';
 import { getPosts, getHealth, getSettings } from './api/client';
 
 export default function App() {
@@ -176,52 +176,14 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── HERO BANNER WITH MOTION GRAPHICS ── */}
+      {/* ── HERO BANNER WITH INTERACTIVE FLOATING OBJECTS ── */}
       <section className="relative pt-12 pb-14 sm:pt-16 sm:pb-20 text-center max-w-5xl mx-auto px-6 overflow-visible">
         
-        {/* Animated Floating Neo-Brutalist Sticker Badges */}
-        <div className="hidden sm:inline-flex absolute top-6 left-2 sm:left-4 sticker-float-1 neo-pill bg-[#ffe400] text-[#111116] cursor-pointer">
-          <Sparkles className="w-3.5 h-3.5 text-[#111116]" />
-          <span>Multi-Channel Distribution</span>
-        </div>
-
-        <div className="hidden sm:inline-flex absolute top-8 right-2 sm:right-6 sticker-float-2 neo-pill bg-[#6CEBB0] text-[#111116] cursor-pointer">
-          <Zap className="w-3.5 h-3.5 text-[#111116]" />
-          <span>Intelligent Content Adaptation</span>
-        </div>
-
-        <div className="hidden md:inline-flex absolute bottom-8 left-12 sticker-float-3 neo-pill bg-[#ff6a91] text-white cursor-pointer">
-          <MessageSquare className="w-3.5 h-3.5 text-white" />
-          <span>Unified Reply Stream</span>
-        </div>
-
-        <div className="hidden md:inline-flex absolute bottom-10 right-14 sticker-float-4 neo-pill bg-[#6a6afe] text-white cursor-pointer">
-          <TrendingUp className="w-3.5 h-3.5 text-white" />
-          <span>Real-Time Performance Metrics</span>
-        </div>
-
-        {/* Animated Neo-Brutalist Spinning Sunburst Badge */}
-        <div className="hidden lg:flex absolute -top-3 right-6 z-20 items-center justify-center pointer-events-auto group cursor-pointer" title="AI-Engineered Multi-Channel Automation">
-          <div className="w-20 h-20 rounded-full bg-[#ffe400] border-2 border-[#111116] shadow-[3px_3px_0px_#111116] flex items-center justify-center relative animate-spin-slow group-hover:[animation-play-state:paused] transition-transform">
-            <svg viewBox="0 0 100 100" className="w-full h-full fill-none">
-              <path
-                id="sunburstText"
-                d="M 50, 50 m -36, 0 a 36,36 0 1,1 72,0 a 36,36 0 1,1 -72,0"
-              />
-              <text className="text-[10px] font-display font-black uppercase tracking-[0.22em] fill-[#111116]">
-                <textPath href="#sunburstText" startOffset="0%">
-                  ★ AUTO BROADCAST ★ AI ENGINE
-                </textPath>
-              </text>
-            </svg>
-          </div>
-          <div className="absolute w-8 h-8 rounded-full bg-[#6a6afe] border-2 border-[#111116] flex items-center justify-center text-white shadow-[1px_1px_0px_#111116] group-hover:scale-125 transition-transform">
-            <Zap className="w-4 h-4 fill-white" />
-          </div>
-        </div>
+        {/* Interactive Floating Motion Objects Stage */}
+        <FloatingObjectsStage />
 
         {/* Small Editorial Category Pill with Pulsing Live Beacon */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border-2 border-[#111116] bg-white text-xs font-display font-bold text-[#111116] mb-5 shadow-[2px_2px_0px_#111116] spring-hover cursor-default">
+        <div className="relative z-10 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border-2 border-[#111116] bg-white text-xs font-display font-bold text-[#111116] mb-5 shadow-[2px_2px_0px_#111116] spring-hover cursor-default">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#6a6afe] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#6a6afe]"></span>
@@ -230,7 +192,7 @@ export default function App() {
         </div>
 
         {/* Monumental Headline */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight leading-[1.05] mb-5 text-[#111116]">
+        <h1 className="relative z-10 text-4xl sm:text-6xl md:text-7xl font-display font-black tracking-tight leading-[1.05] mb-5 text-[#111116]">
           Publish with precision.{' '}
           <span className="bg-[#ff6a91] text-white px-3 sm:px-4 py-0.5 rounded-2xl rotate-[-1deg] inline-block shadow-[4px_4px_0px_#111116] hover:rotate-[1deg] transition-transform">
             Engage in real-time.
@@ -238,13 +200,10 @@ export default function App() {
         </h1>
 
         {/* Professional Subtitle */}
-        <p className="text-[#111116]/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
+        <p className="relative z-10 text-[#111116]/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
           Coordinate content across your publishing channels from a single workbench. Craft tailored variations, preview authentic feeds, schedule campaigns, and respond to audience threads in real time.
         </p>
       </section>
-
-      {/* ── MOTION GRAPHICS INFINITE MARQUEE RIBBON ── */}
-      <MotionMarquee />
 
       {/* ── ORGANIC WAVE SCOOP DIVIDER ── */}
       <div className="w-full relative leading-none -mb-[1px]">
