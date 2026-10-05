@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { UploadCloud, X, Film, Image as ImageIcon, Loader2 } from 'lucide-react';
-import { uploadMedia } from '../api/client';
+import { uploadMedia, resolveMediaUrl } from '../api/client';
 
 export default function MediaUploader({ mediaUrls = [], onChange }) {
   const fileInputRef = useRef(null);
@@ -17,7 +17,7 @@ export default function MediaUploader({ mediaUrls = [], onChange }) {
     try {
       for (const file of Array.from(files)) {
         const result = await uploadMedia(file);
-        newUrls.push(result.url);
+        newUrls.push(resolveMediaUrl(result.url));
       }
       onChange(newUrls);
     } catch (err) {

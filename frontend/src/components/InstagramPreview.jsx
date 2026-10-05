@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, Image as ImageIcon, AlertCircle } from 'lucide-react';
+import { resolveMediaUrl } from '../api/client';
 
 export default function InstagramPreview({ text = '', mediaUrls = [] }) {
   const charCount = text ? text.trim().length : 0;
@@ -94,7 +95,7 @@ export default function InstagramPreview({ text = '', mediaUrls = [] }) {
       {hasMedia ? (
         <div className="relative aspect-square sm:aspect-[4/3] bg-neutral-900 w-full overflow-hidden flex items-center justify-center">
           <img
-            src={mediaUrls[0]}
+            src={resolveMediaUrl(mediaUrls[0])}
             alt="Instagram visual"
             className="w-full h-full object-cover"
           />

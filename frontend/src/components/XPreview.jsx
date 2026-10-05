@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageCircle, Repeat2, Heart, BarChart2, Bookmark, Share, CheckCircle2 } from 'lucide-react';
+import { resolveMediaUrl } from '../api/client';
 
 export default function XPreview({ text = '', mediaUrls = [], charValidation = null }) {
   const charCount = text ? text.trim().length : 0;
@@ -84,7 +85,7 @@ export default function XPreview({ text = '', mediaUrls = [], charValidation = n
               {mediaUrls.map((url, idx) => (
                 <div key={idx} className="relative aspect-video bg-neutral-900 overflow-hidden">
                   <img
-                    src={url}
+                    src={resolveMediaUrl(url)}
                     alt={`Attachment ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />

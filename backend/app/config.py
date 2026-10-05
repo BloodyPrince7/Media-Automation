@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     # Instagram Graph API Credentials (Meta Professional Account)
     INSTAGRAM_ACCESS_TOKEN: Optional[str] = None
-    INSTAGRAM_ACCOUNT_ID: Optional[str] = None  # e.g., 28960740636950255 (verified @pankajkumar_240666)
+    INSTAGRAM_ACCOUNT_ID: Optional[str] = None  # e.g., 17841400000000000 (Instagram Business/Creator Account ID)
 
     # Google Gemini API
     GEMINI_API_KEY: Optional[str] = None

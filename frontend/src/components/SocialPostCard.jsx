@@ -3,7 +3,7 @@ import {
   MessageCircle, Heart, Repeat2, Eye, ExternalLink, 
   Sparkles, Send, CheckCircle2, RotateCcw, Trash2, Globe, Check 
 } from 'lucide-react';
-import { getPostEngagement, postComment, aiSuggestReply, publishPostNow, deletePost } from '../api/client';
+import { getPostEngagement, postComment, aiSuggestReply, publishPostNow, deletePost, resolveMediaUrl } from '../api/client';
 
 export default function SocialPostCard({ post, onRefresh }) {
   const [activePlatform, setActivePlatform] = useState('x');
@@ -404,7 +404,7 @@ export default function SocialPostCard({ post, onRefresh }) {
             {post.media_urls.map((url, idx) => (
               <div key={idx} className="relative aspect-video bg-neutral-900 overflow-hidden">
                 <img
-                  src={url}
+                  src={resolveMediaUrl(url)}
                   alt={`Attached media ${idx + 1}`}
                   className="w-full h-full object-cover"
                 />

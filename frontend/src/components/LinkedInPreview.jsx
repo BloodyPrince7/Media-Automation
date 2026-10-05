@@ -1,5 +1,6 @@
 import React from 'react';
 import { ThumbsUp, MessageSquare, Repeat, Send, Globe, Plus } from 'lucide-react';
+import { resolveMediaUrl } from '../api/client';
 
 export default function LinkedInPreview({ text = '', mediaUrls = [] }) {
   const charCount = text ? text.trim().length : 0;
@@ -78,7 +79,7 @@ export default function LinkedInPreview({ text = '', mediaUrls = [] }) {
             {mediaUrls.map((url, idx) => (
               <img
                 key={idx}
-                src={url}
+                src={resolveMediaUrl(url)}
                 alt="Post Media"
                 className="w-full max-h-96 object-cover"
               />

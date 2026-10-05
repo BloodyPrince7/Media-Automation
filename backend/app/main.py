@@ -547,7 +547,7 @@ async def post_comment_reply(post_id: int, payload: PostCommentCreate, db: Sessi
         post_id=post.id,
         platform=platform,
         author_name="You (Author)",
-        author_handle="@Pagal88114784" if platform == "x" else "Pankaj kumar",
+        author_handle="@creator_studio" if platform == "x" else "@creator_studio",
         content=payload.content.strip(),
         is_author_reply=1,
         parent_comment_id=payload.parent_comment_id,
